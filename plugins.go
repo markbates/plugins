@@ -64,10 +64,16 @@ func (plugs Plugins) SetFileSystem(fs fs.FS) {
 	}
 }
 
+// Find plugins using the given Finder.
 func (plugs Plugins) Find(fn FinderFn) Plugins {
 	return fn(plugs)
 }
 
+// Available will return plugins that are available
+// to be used at the given root. By default, all
+// plugins are available. The AvailabilityChecker
+// interface can be implemented to give the plugin
+// the ability to check if it is available.
 func (plugs Plugins) Available(root string) Plugins {
 	var res Plugins
 

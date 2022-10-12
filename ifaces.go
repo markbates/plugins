@@ -11,6 +11,8 @@ type Scoper interface {
 	ScopedPlugins() Plugins
 }
 
+// Feeder is a function that is used to feed plugins
+// into a Needer implementation.
 type Feeder func() Plugins
 
 // Needer can be implemented to receive a Feeder function

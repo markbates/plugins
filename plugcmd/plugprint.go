@@ -1,4 +1,4 @@
-package plugprint
+package plugcmd
 
 import (
 	"bytes"
@@ -31,7 +31,7 @@ func Print(w io.Writer, main plugins.Plugin) error {
 		fmt.Fprintf(w, "%s\n\n", d.Description())
 	}
 
-	header := strings.TrimSpace(fmt.Sprintf("%s", stringer(main)))
+	header := strings.TrimSpace(cmdName(main))
 	header = fmt.Sprintf("$ %s", header)
 	fmt.Fprintln(w, header)
 	for i := 0; i < len(header); i++ {
@@ -55,12 +55,8 @@ func Print(w io.Writer, main plugins.Plugin) error {
 		}
 	}
 
-	if u, ok := main.(FlagPrinter); ok {
-		const fp = "\nFlags:\n"
-		fmt.Fprint(w, fp)
-		if err := u.PrintFlags(w); err != nil {
-			return err
-		}
+	if err := printFlags(w, main); err != nil {
+		return err
 	}
 
 	if err := printCommands(w, main); err != nil {
@@ -69,6 +65,28 @@ func Print(w io.Writer, main plugins.Plugin) error {
 
 	if err := printPlugins(w, main); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func printFlags(w io.Writer, p plugins.Plugin) error {
+	if u, ok := p.(FlagPrinter); ok {
+		fmt.Fprintln(w)
+		return u.PrintFlags(w)
+	}
+
+	if u, ok := p.(Flagger); ok {
+		flags, err := u.Flags()
+		if err != nil {
+			return err
+		}
+
+		ow := flags.Output()
+		flags.SetOutput(w)
+		fmt.Fprintln(w)
+		flags.Usage()
+		flags.SetOutput(ow)
 	}
 
 	return nil
@@ -161,19 +179,22 @@ func printCommands(w io.Writer, main plugins.Plugin) error {
 	fmt.Fprintf(tw, "\t%s\t%s\n", "Command", "Description")
 	fmt.Fprintf(tw, "\t%s\t%s\n", "-------", "-----------")
 	for _, c := range plugs {
-		line := fmt.Sprintf("\t%s\t%s", cmdName(c), desc(c))
+		line := fmt.Sprintf("\t%s", cmdName(c))
+		if d := desc(c); d != "" {
+			line = fmt.Sprintf("%s\t%s", line, d)
+		}
 		fmt.Fprintln(tw, line)
 	}
 	tw.Flush()
 	return nil
 }
 
-func stringer(p plugins.Plugin) string {
-	if s, ok := p.(fmt.Stringer); ok {
-		return s.String()
-	}
-	return cmdName(p)
-}
+// func stringer(p plugins.Plugin) string {
+// 	if s, ok := p.(fmt.Stringer); ok {
+// 		return s.String()
+// 	}
+// 	return cmdName(p)
+// }
 
 func desc(p plugins.Plugin) string {
 	if d, ok := p.(Describer); ok {
@@ -183,7 +204,7 @@ func desc(p plugins.Plugin) string {
 }
 
 func cmdName(p plugins.Plugin) string {
-	if d, ok := p.(CommandNamer); ok {
+	if d, ok := p.(Namer); ok {
 		return d.CmdName()
 	}
 	return path.Base(p.PluginName())

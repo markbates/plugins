@@ -40,7 +40,7 @@ func Find(name string, plugs plugins.Plugins) Commander {
 			}
 		}
 
-		if name == path.Base(c.PluginName()) {
+		if name == path.Base(p.PluginName()) {
 			return c
 		}
 	}

@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -8,13 +9,26 @@ import (
 func Test_Errors(t *testing.T) {
 	t.Parallel()
 
-	err := fmt.Errorf("boom")
+	exp := "boom"
+	err := fmt.Errorf(exp)
+
 	p := back("a")
 	err = Wrap(p, err)
 
-	exp := `github.com/markbates/plugins.back (a): boom`
-	act := err.Error()
+	var ex Error
+
+	if !errors.As(err, &ex) {
+		t.Fatalf("expected %s to be an Error", err)
+	}
+
+	_, ok := ex.Plugin.(back)
+	if !ok {
+		t.Fatalf("expected %T to be a back", ex.Plugin)
+	}
+
+	act := ex.Err.Error()
+
 	if act != exp {
-		t.Fatalf("expected %s, got %s", exp, act)
+		t.Fatalf("expected %q to be %q", act, exp)
 	}
 }

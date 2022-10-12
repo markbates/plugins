@@ -1,4 +1,4 @@
-package plugprint
+package plugcmd
 
 import (
 	"bytes"
@@ -66,13 +66,12 @@ func Test_Print(t *testing.T) {
 
 $ main
 ------
-github.com/markbates/plugins/plugprint.cmd
+github.com/markbates/plugins/plugcmd.cmd
 
 Aliases:
 main1, main2
 
 Usage of main:
-Flags:
 My Flags
 Available Commands:
   Command    Description
@@ -84,7 +83,7 @@ Available Commands:
 Using Plugins:
   Name  Description       Type
   ----  -----------       ----
-  main  main Description  github.com/markbates/plugins/plugprint.cmd`
+  main  main Description  github.com/markbates/plugins/plugcmd.cmd`
 
 	act := bb.String()
 	act = strings.TrimSpace(act)
