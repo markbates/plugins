@@ -3,9 +3,11 @@ package plugins
 import (
 	"io/fs"
 	"sort"
+
+	"github.com/markbates/iox"
 )
 
-var _ IOSetable = Plugins{}
+var _ iox.IOSetable = Plugins{}
 var _ Needer = Plugins{}
 var _ Scoper = Plugins{}
 var _ sort.Interface = Plugins{}
@@ -39,7 +41,7 @@ func (plugs Plugins) ScopedPlugins() Plugins {
 // IOSetable.
 func (plugs Plugins) SetStdio(io IO) {
 	for _, p := range plugs {
-		if ioable, ok := p.(IOSetable); ok {
+		if ioable, ok := p.(iox.IOSetable); ok {
 			ioable.SetStdio(io)
 		}
 	}
