@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"fmt"
 	"io/fs"
 	"sort"
 
@@ -97,4 +98,8 @@ func (plugs Plugins) Available(root string) Plugins {
 // in Plugins and using it's sort.Interface implementation.
 func Sort(plugs Plugins) {
 	sort.Sort(Plugins(plugs))
+}
+
+func Name(p any) string {
+	return fmt.Sprintf("%T", p)
 }

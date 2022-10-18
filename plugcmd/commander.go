@@ -13,3 +13,8 @@ type CommanderFn func(ctx context.Context, root string, args []string) error
 func (fn CommanderFn) Main(ctx context.Context, root string, args []string) error {
 	return fn(ctx, root, args)
 }
+
+type NamedCommander interface {
+	Commander
+	Namer
+}
