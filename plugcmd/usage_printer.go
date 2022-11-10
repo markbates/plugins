@@ -7,6 +7,7 @@ import "io"
 // `Describer` interface is called. This is useful for printing
 // flag information, links, and other messages to users.
 type UsagePrinter interface {
+	Commander
 	PrintUsage(w io.Writer) error
 }
 

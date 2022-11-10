@@ -2,6 +2,7 @@ package plugcmd
 
 // Aliaser is a command that provides aliases for itself
 type Aliaser interface {
+	Commander
 	CmdAliases() []string
 }
 

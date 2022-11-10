@@ -3,6 +3,7 @@ package plugcmd
 import "flag"
 
 type Flagger interface {
+	Commander
 	Flags() (*flag.FlagSet, error)
 }
 

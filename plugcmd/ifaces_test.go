@@ -25,6 +25,10 @@ func (a aliaser) CmdAliases() []string {
 	return []string(a)
 }
 
+func (a aliaser) Main(ctx context.Context, root string, args []string) error {
+	return nil
+}
+
 var _ plugins.Plugin = namer("")
 var _ Namer = namer("")
 
@@ -36,6 +40,10 @@ func (namer) PluginName() string {
 
 func (n namer) CmdName() string {
 	return string(n)
+}
+
+func (n namer) Main(ctx context.Context, root string, args []string) error {
+	return nil
 }
 
 var _ plugins.Plugin = commander(nil)

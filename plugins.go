@@ -4,14 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"sort"
-
-	"github.com/markbates/iox"
 )
-
-var _ iox.IOSetable = Plugins{}
-var _ Needer = Plugins{}
-var _ Scoper = Plugins{}
-var _ sort.Interface = Plugins{}
 
 // Plugins is a slice of type `Plugin` that provides
 // additional useful functionality.
@@ -42,7 +35,7 @@ func (plugs Plugins) ScopedPlugins() Plugins {
 // IOSetable.
 func (plugs Plugins) SetStdio(io IO) {
 	for _, p := range plugs {
-		if ioable, ok := p.(iox.IOSetable); ok {
+		if ioable, ok := p.(IOSetable); ok {
 			ioable.SetStdio(io)
 		}
 	}

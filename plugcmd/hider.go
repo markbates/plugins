@@ -1,6 +1,7 @@
 package plugcmd
 
 type Hider interface {
+	Commander
 	HidePlugin()
 }
 

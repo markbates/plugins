@@ -4,6 +4,7 @@ import "io/fs"
 
 // FSable can be implemented to return an fs.FS
 type FSable interface {
+	Plugin
 	FileSystem() fs.FS
 }
 

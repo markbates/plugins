@@ -1,10 +1,15 @@
 package plugcmd
 
-import "context"
+import (
+	"context"
+
+	"github.com/markbates/plugins"
+)
 
 // Commander is a plugin that is meant to be the beginning of
 // a CLI application
 type Commander interface {
+	plugins.Plugin
 	Main(ctx context.Context, root string, args []string) error
 }
 

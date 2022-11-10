@@ -2,6 +2,7 @@ package plugcmd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -13,6 +14,10 @@ import (
 
 type cmd struct {
 	name string
+}
+
+func (c cmd) Main(ctx context.Context, root string, args []string) error {
+	return nil
 }
 
 func (c cmd) Description() string {
@@ -88,6 +93,6 @@ Using Plugins:
 	act := bb.String()
 	act = strings.TrimSpace(act)
 
-	// fmt.Println(act)
+	fmt.Println(act)
 	r.Equal(exp, act)
 }
