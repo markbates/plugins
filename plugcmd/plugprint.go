@@ -140,10 +140,10 @@ func typeName(p plugins.Plugin) string {
 }
 
 func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) {
-	if _, ok := mm[plug.PluginName()]; ok {
-		return
-	}
-	mm[plug.PluginName()] = plug
+	// if _, ok := mm[plug.PluginName()]; ok {
+	// 	return
+	// }
+	// mm[plug.PluginName()] = plug
 
 	wp, ok := plug.(plugins.Scoper)
 	if !ok {
