@@ -91,10 +91,7 @@ func Test_Print(t *testing.T) {
 	err := Print(bb, c)
 	r.NoError(err)
 
-	exp := `
-Description of main
-
-$ main
+	exp := `$ main
 ------
 github.com/markbates/plugins/plugcmd.cmd
 
@@ -124,7 +121,7 @@ Using Plugins:
 	act := bb.String()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 
 	r.Equal(exp, act)
 }

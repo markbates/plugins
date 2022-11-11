@@ -26,9 +26,6 @@ import (
 //		foobar info     Print diagnostic information (useful for debugging)
 //		foobar version  Print the version information
 func Print(w io.Writer, main plugins.Plugin) error {
-	if d, ok := main.(Describer); ok {
-		fmt.Fprintf(w, "%s\n\n", d.Description())
-	}
 
 	header := strings.TrimSpace(cmdName(main))
 	header = fmt.Sprintf("$ %s", header)
@@ -43,12 +40,13 @@ func Print(w io.Writer, main plugins.Plugin) error {
 		if err := u.PrintUsage(w); err != nil {
 			return err
 		}
+		fmt.Fprintln(w)
 	}
 
 	if a, ok := main.(Aliaser); ok {
 		aliases := a.CmdAliases()
 		if len(aliases) != 0 {
-			const al = "\n\nAliases:\n"
+			const al = "\nAliases:\n"
 			fmt.Fprint(w, al)
 			fmt.Fprintln(w, strings.Join(aliases, ", "))
 		}
