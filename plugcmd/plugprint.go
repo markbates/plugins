@@ -94,7 +94,9 @@ func printFlags(w io.Writer, p plugins.Plugin) error {
 
 func printPlugins(w io.Writer, main plugins.Plugin) error {
 	mm := map[string]plugins.Plugin{}
+
 	usingPlugins(main, mm)
+
 	if len(mm) == 0 {
 		return nil
 	}
@@ -103,6 +105,7 @@ func printPlugins(w io.Writer, main plugins.Plugin) error {
 	for _, p := range mm {
 		plugs = append(plugs, p)
 	}
+
 	sort.Slice(plugs, func(i, j int) bool {
 		return plugs[i].PluginName() < plugs[j].PluginName()
 	})
@@ -154,7 +157,6 @@ func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) {
 		mm[p.PluginName()] = p
 	}
 
-	return
 }
 
 func printCommands(w io.Writer, main plugins.Plugin) error {

@@ -12,8 +12,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type stringPlugin string
+
+func (s stringPlugin) PluginName() string {
+	return string(s)
+}
+
 type cmd struct {
-	name string
+	name  string
+	plugs plugins.Plugins
+}
+
+func (c cmd) ScopedPlugins() plugins.Plugins {
+	return c.plugs
 }
 
 func (c cmd) Main(ctx context.Context, root string, args []string) error {
@@ -50,7 +61,7 @@ func (c cmd) SubCommands() plugins.Plugins {
 }
 
 func (cmd) PrintFlags(w io.Writer) error {
-	_, err := w.Write([]byte(`My Flags`))
+	_, err := w.Write([]byte("My Flags\n"))
 	return err
 }
 
@@ -60,6 +71,10 @@ func Test_Print(t *testing.T) {
 
 	c := cmd{
 		name: "main",
+		plugs: plugins.Plugins{
+			stringPlugin("one"),
+			stringPlugin("two"),
+		},
 	}
 
 	bb := &bytes.Buffer{}
@@ -78,6 +93,7 @@ main1, main2
 
 Usage of main:
 My Flags
+
 Available Commands:
   Command    Description
   -------    -----------
@@ -86,13 +102,14 @@ Available Commands:
   main sub3  main sub3 Description
 
 Using Plugins:
-  Name  Description       Type
-  ----  -----------       ----
-  main  main Description  github.com/markbates/plugins/plugcmd.cmd`
+  Name  Description  Type
+  ----  -----------  ----
+  one                github.com/markbates/plugins/plugcmd.stringPlugin
+  two                github.com/markbates/plugins/plugcmd.stringPlugin`
 
 	act := bb.String()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 }
