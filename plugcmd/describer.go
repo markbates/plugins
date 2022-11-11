@@ -4,7 +4,6 @@ package plugcmd
 // implemented to print a short, single line,
 // description of the plugin. `-h`
 type Describer interface {
-	Commander
 	Description() string
 }
 

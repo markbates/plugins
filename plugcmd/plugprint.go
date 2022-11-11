@@ -16,16 +16,15 @@ import (
 // Print will try and print a helpful Usage printing
 // of the plugin and any plugins that are provided.
 //
-//	$ buffalo
+//	$ foobar
 //	---------
 //
-//	Usage of buffalo:
+//	Usage of foobar:
 //	-h, --help   print this help
 //
 //	Available Commands:
-//		buffalo fix      Attempt to fix a Buffalo application's API to match version in go.mod
-//		buffalo info     Print diagnostic information (useful for debugging)
-//		buffalo version  Print the version information
+//		foobar info     Print diagnostic information (useful for debugging)
+//		foobar version  Print the version information
 func Print(w io.Writer, main plugins.Plugin) error {
 	if d, ok := main.(Describer); ok {
 		fmt.Fprintf(w, "%s\n\n", d.Description())
@@ -39,19 +38,19 @@ func Print(w io.Writer, main plugins.Plugin) error {
 	}
 	fmt.Fprintf(w, "\n%s\n", typeName(main))
 
-	if a, ok := main.(Aliaser); ok {
-		aliases := a.CmdAliases()
-		if len(aliases) != 0 {
-			const al = "\nAliases:\n"
-			fmt.Fprint(w, al)
-			fmt.Fprintln(w, strings.Join(aliases, ", "))
-		}
-	}
-
 	if u, ok := main.(UsagePrinter); ok {
 		fmt.Fprintln(w)
 		if err := u.PrintUsage(w); err != nil {
 			return err
+		}
+	}
+
+	if a, ok := main.(Aliaser); ok {
+		aliases := a.CmdAliases()
+		if len(aliases) != 0 {
+			const al = "\n\nAliases:\n"
+			fmt.Fprint(w, al)
+			fmt.Fprintln(w, strings.Join(aliases, ", "))
 		}
 	}
 
@@ -72,7 +71,8 @@ func Print(w io.Writer, main plugins.Plugin) error {
 
 func printFlags(w io.Writer, p plugins.Plugin) error {
 	if u, ok := p.(FlagPrinter); ok {
-		fmt.Fprintln(w)
+		// fmt.Fprintln(w)
+		fmt.Fprintln(w, "\nFlags:")
 		return u.PrintFlags(w)
 	}
 

@@ -18,8 +18,13 @@ func (s stringPlugin) PluginName() string {
 	return string(s)
 }
 
+func (s stringPlugin) Description() string {
+	return "string/plugin"
+}
+
 type cmd struct {
 	name  string
+	desc  string
 	plugs plugins.Plugins
 }
 
@@ -32,7 +37,11 @@ func (c cmd) Main(ctx context.Context, root string, args []string) error {
 }
 
 func (c cmd) Description() string {
-	return fmt.Sprintf("%s Description", c.name)
+	if len(c.desc) > 0 {
+		return c.desc
+	}
+
+	return fmt.Sprintf("Description of %s", c.name)
 }
 
 func (c cmd) PluginName() string {
@@ -47,7 +56,7 @@ func (c cmd) CmdAliases() []string {
 }
 
 func (c cmd) PrintUsage(w io.Writer) error {
-	s := fmt.Sprintf("Usage of %s:", c.name)
+	s := fmt.Sprintf("This is how to use %s.", c.name)
 	_, err := w.Write([]byte(s))
 	return err
 }
@@ -82,34 +91,40 @@ func Test_Print(t *testing.T) {
 	err := Print(bb, c)
 	r.NoError(err)
 
-	exp := `main Description
+	exp := `
+Description of main
 
 $ main
 ------
 github.com/markbates/plugins/plugcmd.cmd
 
+This is how to use main.
+
 Aliases:
 main1, main2
 
-Usage of main:
+Flags:
 My Flags
 
 Available Commands:
   Command    Description
   -------    -----------
-  main sub1  main sub1 Description
-  main sub2  main sub2 Description
-  main sub3  main sub3 Description
+  main sub1  Description of main sub1
+  main sub2  Description of main sub2
+  main sub3  Description of main sub3
 
 Using Plugins:
-  Name  Description  Type
-  ----  -----------  ----
-  one                github.com/markbates/plugins/plugcmd.stringPlugin
-  two                github.com/markbates/plugins/plugcmd.stringPlugin`
+  Name  Description    Type
+  ----  -----------    ----
+  one   string/plugin  github.com/markbates/plugins/plugcmd.stringPlugin
+  two   string/plugin  github.com/markbates/plugins/plugcmd.stringPlugin`
+
+	exp = strings.TrimSpace(exp)
 
 	act := bb.String()
 	act = strings.TrimSpace(act)
 
-	// fmt.Println(act)
+	fmt.Println(act)
+
 	r.Equal(exp, act)
 }
