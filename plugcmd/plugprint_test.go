@@ -61,8 +61,8 @@ func (c cmd) PrintUsage(w io.Writer) error {
 	return err
 }
 
-func (c cmd) SubCommands() plugins.Plugins {
-	return plugins.Plugins{
+func (c cmd) SubCommands() []Commander {
+	return []Commander{
 		cmd{name: fmt.Sprintf("%s sub1", c.name)},
 		cmd{name: fmt.Sprintf("%s sub2", c.name)},
 		cmd{name: fmt.Sprintf("%s sub3", c.name)},

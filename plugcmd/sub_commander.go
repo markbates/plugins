@@ -6,7 +6,7 @@ import "github.com/markbates/plugins"
 // that can be used as sub-commands of the current Plugin
 type SubCommander interface {
 	Commander
-	SubCommands() plugins.Plugins
+	SubCommands() []Commander
 }
 
 type SubCommanderFn func() plugins.Plugins
