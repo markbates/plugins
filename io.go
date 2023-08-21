@@ -28,12 +28,12 @@ type Stdiner interface {
 
 type Stdouter interface {
 	Plugin
-	Stdout() io.ReadWriter
+	Stdout() io.Writer
 }
 
 type Stderrer interface {
 	Plugin
-	Stderr() io.ReadWriter
+	Stderr() io.Writer
 }
 
 type Stdioer interface {
