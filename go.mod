@@ -3,7 +3,7 @@ module github.com/markbates/plugins
 go 1.19
 
 require (
-	github.com/markbates/iox v0.0.0-20221012170617-7f64922722ac
+	github.com/markbates/iox v0.0.0-20230829013604-e0813da73cc6
 	github.com/stretchr/testify v1.8.0
 )
 
