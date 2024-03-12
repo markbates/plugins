@@ -43,9 +43,11 @@ func (plugs Plugins) ScopedPlugins() Plugins {
 // SetStdio for those plugins that implement
 // IOSetable.
 func (plugs Plugins) SetStdio(io IO) error {
-	for _, p := range plugs {
-		if ioable, ok := p.(IOSetable); ok {
-			ioable.SetStdio(io)
+	ios := ByType[IOSetable](plugs)
+
+	for _, p := range ios {
+		if err := p.SetStdio(io); err != nil {
+			return err
 		}
 	}
 
@@ -55,13 +57,14 @@ func (plugs Plugins) SetStdio(io IO) error {
 // WithPlugins will call any Needer plugins with the
 // Feeder function.
 func (plugs Plugins) WithPlugins(fn FeederFn) error {
-	for _, p := range plugs {
-		needer, ok := p.(Needer)
-		if !ok {
-			continue
-		}
+	if fn == nil {
+		return fmt.Errorf("no FeederFn provided")
+	}
 
-		if err := needer.WithPlugins(fn); err != nil {
+	needers := ByType[Needer](plugs)
+
+	for _, n := range needers {
+		if err := n.WithPlugins(fn); err != nil {
 			return err
 		}
 	}
@@ -71,13 +74,14 @@ func (plugs Plugins) WithPlugins(fn FeederFn) error {
 
 // SetFS for those plugins that implement FSSetable.
 func (plugs Plugins) SetFileSystem(fs fs.FS) error {
-	for _, p := range plugs {
-		fss, ok := p.(FSSetable)
-		if !ok {
-			continue
-		}
+	if fs == nil {
+		return fmt.Errorf("no fs.FS provided")
+	}
 
-		if err := fss.SetFileSystem(fs); err != nil {
+	fsps := ByType[FSSetable](plugs)
+
+	for _, p := range fsps {
+		if err := p.SetFileSystem(fs); err != nil {
 			return err
 		}
 	}
