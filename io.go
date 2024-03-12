@@ -45,17 +45,17 @@ type Stdouter interface {
 // plugins that implement Outer. If none are found,
 // then os.Stdout is returned
 func Stdout(plugs ...Plugin) io.Writer {
-	var ins []io.Writer
-
-	for _, p := range plugs {
-		if x, ok := p.(Stdouter); ok {
-			ins = append(ins, x.Stdout())
-		}
-	}
-
-	if len(ins) == 0 {
+	if len(plugs) == 0 {
 		return os.Stdout
 	}
+
+	var ins []io.Writer
+
+	outs := ByType[Stdouter](plugs)
+	for _, p := range outs {
+		ins = append(ins, p.Stdout())
+	}
+
 	return io.MultiWriter(ins...)
 }
 
@@ -63,16 +63,15 @@ func Stdout(plugs ...Plugin) io.Writer {
 // plugins that implement Outer. If none are found,
 // then os.Stderr is returned
 func Stderr(plugs ...Plugin) io.Writer {
-	var ins []io.Writer
-
-	for _, p := range plugs {
-		if x, ok := p.(Stderrer); ok {
-			ins = append(ins, x.Stderr())
-		}
+	if len(plugs) == 0 {
+		return os.Stderr
 	}
 
-	if len(ins) == 0 {
-		return os.Stderr
+	var ins []io.Writer
+
+	outs := ByType[Stderrer](plugs)
+	for _, p := range outs {
+		ins = append(ins, p.Stderr())
 	}
 
 	return io.MultiWriter(ins...)

@@ -22,11 +22,13 @@ func FindFromArgs(args []string, plugs plugins.Plugins) Commander {
 
 // Find wraps the other cmd finders into a mega finder for cmds
 func Find(name string, plugs plugins.Plugins) Commander {
-	for _, p := range plugs {
-		c, ok := p.(Commander)
-		if !ok {
-			continue
-		}
+	if len(plugs) == 0 {
+		return nil
+	}
+
+	cmds := plugins.ByType[Commander](plugs)
+
+	for _, c := range cmds {
 		if n, ok := c.(Namer); ok {
 			if n.CmdName() == name {
 				return c
@@ -41,7 +43,7 @@ func Find(name string, plugs plugins.Plugins) Commander {
 			}
 		}
 
-		if name == path.Base(p.PluginName()) {
+		if name == path.Base(c.PluginName()) {
 			return c
 		}
 	}
