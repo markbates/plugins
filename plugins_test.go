@@ -43,12 +43,10 @@ func Test_Plugins_PluginFeeder(t *testing.T) {
 		stringPlug("c"),
 	}
 
-	fn, err := plugs.PluginFeeder()
-	r.NoError(err)
+	fn := plugs.PluginFeeder()
+	r.NotNil(fn)
 
-	act, err := fn()
-	r.NoError(err)
-
+	act := fn()
 	r.Equal(plugs, act)
 }
 
@@ -62,8 +60,7 @@ func Test_Plugins_ScopedPlugins(t *testing.T) {
 		stringPlug("c"),
 	}
 
-	act, err := plugs.ScopedPlugins()
-	r.NoError(err)
+	act := plugs.ScopedPlugins()
 
 	r.Equal(plugs, act)
 }
@@ -112,8 +109,8 @@ func Test_Plugins_WithPlugins(t *testing.T) {
 			&needFeedPlug{},
 		}
 
-		fn := func() (Plugins, error) {
-			return plugs, nil
+		fn := func() Plugins {
+			return plugs
 		}
 
 		err := plugs.WithPlugins(fn)
@@ -125,11 +122,10 @@ func Test_Plugins_WithPlugins(t *testing.T) {
 				continue
 			}
 
-			fn, err := ip.PluginFeeder()
-			r.NoError(err)
+			fn := ip.PluginFeeder()
+			r.NotNil(fn)
 
-			act, err := fn()
-			r.NoError(err)
+			act := fn()
 
 			r.Equal(plugs, act)
 		}

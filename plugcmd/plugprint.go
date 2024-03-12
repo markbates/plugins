@@ -138,20 +138,16 @@ func typeName(p plugins.Plugin) string {
 }
 
 func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) error {
-	// if _, ok := mm[plug.PluginName()]; ok {
-	// 	return
-	// }
-	// mm[plug.PluginName()] = plug
+	if mm == nil {
+		return fmt.Errorf("mm cannot be nil")
+	}
 
 	wp, ok := plug.(plugins.Scoper)
 	if !ok {
 		return nil
 	}
 
-	plugs, err := wp.ScopedPlugins()
-	if err != nil {
-		return err
-	}
+	plugs := wp.ScopedPlugins()
 
 	for _, p := range plugs {
 		mm[p.PluginName()] = p

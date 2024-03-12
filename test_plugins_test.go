@@ -65,12 +65,12 @@ func (n *needFeedPlug) WithPlugins(fn FeederFn) error {
 	return nil
 }
 
-func (n *needFeedPlug) PluginFeeder() (FeederFn, error) {
+func (n *needFeedPlug) PluginFeeder() FeederFn {
 	if n == nil || n.Fn == nil {
-		return nil, fmt.Errorf("no FeederFn set")
+		return func() Plugins { return nil }
 	}
 
-	return n.Fn, nil
+	return n.Fn
 }
 
 func (n *needFeedPlug) PluginName() string {

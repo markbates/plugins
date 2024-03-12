@@ -29,15 +29,15 @@ func (plugs Plugins) Swap(i int, j int) {
 	plugs[i], plugs[j] = plugs[j], plugs[i]
 }
 
-func (plugs Plugins) PluginFeeder() (FeederFn, error) {
-	return func() (Plugins, error) {
-		return plugs, nil
-	}, nil
+func (plugs Plugins) PluginFeeder() FeederFn {
+	return func() Plugins {
+		return plugs
+	}
 }
 
 // ScopedPlugins implements Scoper, return itself.
-func (plugs Plugins) ScopedPlugins() (Plugins, error) {
-	return plugs, nil
+func (plugs Plugins) ScopedPlugins() Plugins {
+	return plugs
 }
 
 // SetStdio for those plugins that implement

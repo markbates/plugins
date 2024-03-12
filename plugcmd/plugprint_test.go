@@ -31,8 +31,8 @@ type cmd struct {
 	plugs plugins.Plugins
 }
 
-func (c cmd) ScopedPlugins() (plugins.Plugins, error) {
-	return c.plugs, nil
+func (c cmd) ScopedPlugins() plugins.Plugins {
+	return c.plugs
 }
 
 func (c cmd) Main(ctx context.Context, root string, args []string) error {
