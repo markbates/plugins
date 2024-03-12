@@ -8,11 +8,11 @@ import (
 )
 
 type Flagger interface {
+	plugins.Plugin
 	Flags() (*flag.FlagSet, error)
 }
 
 var _ Flagger = FlaggerFn(nil)
-var _ plugins.Plugin = FlaggerFn(nil)
 
 // FlaggerFn is a function that can be used to implement the Flagger interface
 type FlaggerFn func() (*flag.FlagSet, error)

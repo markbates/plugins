@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"fmt"
 	"io/fs"
 )
 
@@ -111,4 +112,8 @@ func (plugs Plugins) Available(root string) Plugins {
 	}
 
 	return res
+}
+
+func (plugs Plugins) PluginName() string {
+	return fmt.Sprintf("%T", plugs)
 }

@@ -10,11 +10,11 @@ import (
 // implemented to print a short, single line,
 // description of the plugin. `-h`
 type Describer interface {
+	plugins.Plugin
 	Description() string
 }
 
 var _ Describer = DescriberFn(nil)
-var _ plugins.Plugin = DescriberFn(nil)
 
 // DescriberFn is a function that can be used to implement the Describer interface
 type DescriberFn func() string
