@@ -16,6 +16,7 @@ func FindFromArgs(args []string, plugs plugins.Plugins) Commander {
 		}
 		return Find(a, plugs)
 	}
+
 	return nil
 }
 
@@ -44,5 +45,6 @@ func Find(name string, plugs plugins.Plugins) Commander {
 			return c
 		}
 	}
+
 	return nil
 }

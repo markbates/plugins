@@ -113,9 +113,6 @@ func printPlugins(w io.Writer, main plugins.Plugin) error {
 	fmt.Fprintf(tw, "\t%s\t%s\t%s\n", "Name", "Description", "Type")
 	fmt.Fprintf(tw, "\t%s\t%s\t%s\n", "----", "-----------", "----")
 	for _, p := range plugs {
-		if _, ok := p.(Hider); ok {
-			continue
-		}
 		fmt.Fprintf(tw, "\t%s\t%s\t%s\n", p.PluginName(), desc(p), typeName(p))
 	}
 
@@ -140,21 +137,23 @@ func typeName(p plugins.Plugin) string {
 	return bb.String()
 }
 
-func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) {
-	// if _, ok := mm[plug.PluginName()]; ok {
-	// 	return
-	// }
-	// mm[plug.PluginName()] = plug
+func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) error {
+	if mm == nil {
+		return fmt.Errorf("mm cannot be nil")
+	}
 
 	wp, ok := plug.(plugins.Scoper)
 	if !ok {
-		return
+		return nil
 	}
 
-	for _, p := range wp.ScopedPlugins() {
+	plugs := wp.ScopedPlugins()
+
+	for _, p := range plugs {
 		mm[p.PluginName()] = p
 	}
 
+	return nil
 }
 
 func printCommands(w io.Writer, main plugins.Plugin) error {
@@ -185,16 +184,10 @@ func printCommands(w io.Writer, main plugins.Plugin) error {
 		}
 		fmt.Fprintln(tw, line)
 	}
+
 	tw.Flush()
 	return nil
 }
-
-// func stringer(p plugins.Plugin) string {
-// 	if s, ok := p.(fmt.Stringer); ok {
-// 		return s.String()
-// 	}
-// 	return cmdName(p)
-// }
 
 func desc(p plugins.Plugin) string {
 	if d, ok := p.(Describer); ok {

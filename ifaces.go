@@ -8,24 +8,26 @@ type Plugin interface {
 // Scoper can be implemented to return a slice of plugins that
 // are important to the type defining it.
 type Scoper interface {
-	Plugin
 	ScopedPlugins() Plugins
 }
 
-// Feeder is a function that is used to feed plugins
+// FeederFn is a function that is used to feed plugins
 // into a Needer implementation.
-type Feeder func() Plugins
+type FeederFn func() Plugins
+
+// Feeder can be implemented to return a FeederFn.
+type Feeder interface {
+	PluginFeeder() FeederFn
+}
 
 // Needer can be implemented to receive a Feeder function
 // that can be used to gain access to other plugins in the system.
 type Needer interface {
-	Plugin
-	WithPlugins(Feeder)
+	WithPlugins(FeederFn) error
 }
 
 // AvailabilityChecker can be implemented to check if a plugin
 // is available to be used at the given root.
 type AvailabilityChecker interface {
-	Plugin
 	PluginAvailable(root string) bool
 }

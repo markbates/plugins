@@ -1,16 +1,27 @@
 package plugcmd
 
-import "github.com/markbates/plugins"
+import (
+	"fmt"
+
+	"github.com/markbates/plugins"
+)
 
 // SubCommander can be implemented to provide a list of plugins.Plugin
 // that can be used as sub-commands of the current Plugin
 type SubCommander interface {
-	Commander
 	SubCommands() []Commander
 }
 
-type SubCommanderFn func() plugins.Plugins
+var _ SubCommander = SubCommanderFn(nil)
+var _ plugins.Plugin = SubCommanderFn(nil)
 
-func (fn SubCommanderFn) SubCommands() plugins.Plugins {
+// SubCommanderFn is a function that can be used to implement the SubCommander interface
+type SubCommanderFn func() []Commander
+
+func (fn SubCommanderFn) SubCommands() []Commander {
 	return fn()
+}
+
+func (fn SubCommanderFn) PluginName() string {
+	return fmt.Sprintf("%T", fn)
 }

@@ -22,6 +22,9 @@ func (s stringPlugin) Description() string {
 	return "string/plugin"
 }
 
+var _ plugins.Scoper = cmd{}
+var _ SubCommander = cmd{}
+
 type cmd struct {
 	name  string
 	desc  string
