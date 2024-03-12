@@ -9,11 +9,11 @@ import (
 // SubCommander can be implemented to provide a list of plugins.Plugin
 // that can be used as sub-commands of the current Plugin
 type SubCommander interface {
+	plugins.Plugin
 	SubCommands() []Commander
 }
 
 var _ SubCommander = SubCommanderFn(nil)
-var _ plugins.Plugin = SubCommanderFn(nil)
 
 // SubCommanderFn is a function that can be used to implement the SubCommander interface
 type SubCommanderFn func() []Commander

@@ -12,11 +12,11 @@ import (
 // `Describer` interface is called. This is useful for printing
 // flag information, links, and other messages to users.
 type UsagePrinter interface {
+	plugins.Plugin
 	PrintUsage(w io.Writer) error
 }
 
 var _ UsagePrinter = UsagePrinterFn(nil)
-var _ plugins.Plugin = UsagePrinterFn(nil)
 
 // UsagePrinterFn is a function that can be used to implement the UsagePrinter interface
 type UsagePrinterFn func(w io.Writer) error
