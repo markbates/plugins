@@ -6,9 +6,9 @@ import (
 	"github.com/markbates/plugins"
 )
 
-type background string
+type stringPlug string
 
-func (b background) PluginName() string {
+func (b stringPlug) PluginName() string {
 	return string(b)
 }
 

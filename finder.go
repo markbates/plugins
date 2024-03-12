@@ -4,25 +4,25 @@ import (
 	"path"
 )
 
-// Finder can be implemented to find plugins
-type Finder interface {
-	Find(plugs Plugins) Plugins
+// Findable can be implemented to find plugins
+type Findable interface {
+	Find(plugs Plugins) (Plugins, error)
 }
 
 // FinderFn is a function that can be used
 // to find plugins. It implements the Finder
 // interface.
-type FinderFn func(plugs Plugins) Plugins
+type FinderFn func(plugs Plugins) (Plugins, error)
 
 // Find plugins using the underlying function.
-func (f FinderFn) Find(plugs Plugins) Plugins {
+func (f FinderFn) Find(plugs Plugins) (Plugins, error) {
 	return f(plugs)
 }
 
 // Background finder that will search for a
 // plugin based on the plugin's name.
-func Background(name string) Finder {
-	fn := func(plugs Plugins) Plugins {
+func Background(name string) Findable {
+	fn := func(plugs Plugins) (Plugins, error) {
 		var res Plugins
 
 		for _, p := range plugs {
@@ -37,8 +37,9 @@ func Background(name string) Finder {
 			}
 		}
 
-		return res
+		return res, nil
 	}
+
 	return FinderFn(fn)
 }
 

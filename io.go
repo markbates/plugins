@@ -10,38 +10,15 @@ import (
 type IO = iox.IO
 
 // IOable can be implemented to return an IO.
-type IOable interface {
-	Plugin
-	Stdio() IO
-}
+type IOable = iox.IOable
 
 // IOSetable can be implemented to receive an IO.
-type IOSetable interface {
-	Plugin
-	SetStdio(oi IO)
-}
+type IOSetable = iox.IOSetable
 
-type Stdiner interface {
-	Plugin
-	Stdin() io.Reader
-}
-
-type Stdouter interface {
-	Plugin
-	Stdout() io.Writer
-}
-
-type Stderrer interface {
-	Plugin
-	Stderr() io.Writer
-}
-
-type Stdioer interface {
-	Plugin
-	Stderrer
-	Stdiner
-	Stdouter
-}
+type Stderrer = iox.Stderrer
+type Stdiner = iox.Stdiner
+type Stdioer = iox.Stdioer
+type Stdouter = iox.Stdouter
 
 // Stdout returns a io.MultiWriter containing all
 // plugins that implement Outer. If none are found,

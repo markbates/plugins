@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/markbates/plugins"
+	"github.com/stretchr/testify/require"
 )
 
 type mega struct {
@@ -37,39 +38,44 @@ func (m mega) Main(ctx context.Context, root string, args []string) error {
 
 func Test_Find(t *testing.T) {
 	t.Parallel()
+	r := require.New(t)
+
+	p := Find("mega", plugins.Plugins{})
+	r.Nil(p)
+
 	m := mega{
 		aliases: []string{"m"},
 	}
 
 	plugs := plugins.Plugins{
-		background("a"),
+		stringPlug("a"),
 		m,
-		background("c"),
+		stringPlug("c"),
 	}
 
 	table := []string{"mega", "megacmd", "m"}
 	for _, tt := range table {
-		p := Find(tt, plugs)
+		p = Find(tt, plugs)
 
-		if p == nil {
-			t.Fatalf("Expected to find plugin %s", tt)
-		}
+		r.NotNil(p)
 	}
 }
 
 func Test_FindFromArgs(t *testing.T) {
 	t.Parallel()
+	r := require.New(t)
+
+	p := FindFromArgs([]string{}, plugins.Plugins{})
+	r.Nil(p)
+
 	var m mega
-
 	plugs := plugins.Plugins{
-		background("a"),
+		stringPlug("a"),
 		m,
-		background("c"),
+		stringPlug("c"),
 	}
 
-	p := FindFromArgs([]string{"--flag", "mega", "--flag2"}, plugs)
-
-	if p == nil {
-		t.Fatalf("Expected to find plugin mega")
-	}
+	p = FindFromArgs([]string{"--flag", "mega", "--flag2"}, plugs)
+	r.NotNil(p)
+	r.Equal(m, p)
 }

@@ -22,14 +22,17 @@ func (s stringPlugin) Description() string {
 	return "string/plugin"
 }
 
+var _ plugins.Scoper = cmd{}
+var _ SubCommander = cmd{}
+
 type cmd struct {
 	name  string
 	desc  string
 	plugs plugins.Plugins
 }
 
-func (c cmd) ScopedPlugins() plugins.Plugins {
-	return c.plugs
+func (c cmd) ScopedPlugins() (plugins.Plugins, error) {
+	return c.plugs, nil
 }
 
 func (c cmd) Main(ctx context.Context, root string, args []string) error {

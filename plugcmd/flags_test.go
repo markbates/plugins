@@ -3,9 +3,14 @@ package plugcmd
 import (
 	"flag"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_SetToSlice(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
 	var help bool
 	var name string
 
@@ -17,47 +22,45 @@ func Test_SetToSlice(t *testing.T) {
 
 	exp := 2
 	act := len(slice)
-	if act != exp {
-		t.Fatalf("Expected %d flags, got %d", exp, act)
-	}
+	r.Equal(exp, act)
 }
 
 func Test_CleanFlags(t *testing.T) {
-	p := background("foo")
+	t.Parallel()
+	r := require.New(t)
+
+	p := NamerFn(func() string {
+		return "foo"
+	})
 
 	flags := Clean(p, []*flag.Flag{
 		{Name: "my-flag"},
 	})
 
-	if len(flags) != 1 {
-		t.Fatalf("Expected %d flags, got %d", 1, len(flags))
-	}
+	r.Len(flags, 1)
 
 	f := flags[0]
 
 	exp := "foo-my-flag"
 	act := f.Name
-	if act != exp {
-		t.Fatalf("Expected %s, got %s)", exp, act)
-	}
+	r.Equal(exp, act)
 }
 
 func Test_CleanFlagSet(t *testing.T) {
-	p := background("foo")
+	t.Parallel()
+	r := require.New(t)
+
+	p := stringPlug("foo")
 
 	set := flag.NewFlagSet("", flag.ContinueOnError)
 	set.String("my-flag", "", "")
 	flags := CleanSet(p, set)
 
-	if len(flags) != 1 {
-		t.Fatalf("Expected %d flags, got %d", 1, len(flags))
-	}
+	r.Len(flags, 1)
 
 	f := flags[0]
 
 	exp := "foo-my-flag"
 	act := f.Name
-	if act != exp {
-		t.Fatalf("Expected %s, got %s)", exp, act)
-	}
+	r.Equal(exp, act)
 }
