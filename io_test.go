@@ -1,10 +1,12 @@
-package plugins
+package plugins_test
 
 import (
 	"os"
 	"testing"
 
 	"github.com/markbates/iox"
+	. "github.com/markbates/plugins"
+	"github.com/markbates/plugins/plugtest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,9 +23,9 @@ func Test_Stdout(t *testing.T) {
 	bf3 := iox.Buffer{}
 
 	plugs := Plugins{
-		&ioPlug{IO: bf1.IO()},
-		&ioPlug{IO: bf2.IO()},
-		&ioPlug{IO: bf3.IO()},
+		&plugtest.IO{IO: bf1.IO()},
+		&plugtest.IO{IO: bf2.IO()},
+		&plugtest.IO{IO: bf3.IO()},
 	}
 
 	w = Stdout(plugs...)
@@ -48,9 +50,9 @@ func Test_Stderr(t *testing.T) {
 	bf3 := iox.Buffer{}
 
 	plugs := Plugins{
-		&ioPlug{IO: bf1.IO()},
-		&ioPlug{IO: bf2.IO()},
-		&ioPlug{IO: bf3.IO()},
+		&plugtest.IO{IO: bf1.IO()},
+		&plugtest.IO{IO: bf2.IO()},
+		&plugtest.IO{IO: bf3.IO()},
 	}
 
 	w = Stderr(plugs...)
