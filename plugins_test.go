@@ -1,12 +1,13 @@
-package plugins
+package plugins_test
 
 import (
 	"sort"
-	"strings"
 	"testing"
 	"testing/fstest"
 
 	"github.com/markbates/iox"
+	. "github.com/markbates/plugins"
+	"github.com/markbates/plugins/plugtest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,22 +16,14 @@ func Test_Plugins_Sort(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		stringPlug("b"),
-		stringPlug("c"),
-		stringPlug("a"),
+		plugtest.Simple(2),
+		plugtest.Simple(1),
 	}
 
 	sort.Sort(plugs)
 
-	exp := []string{"a", "b", "c"}
-	var act []string
-	for _, p := range plugs {
-		act = append(act, p.PluginName())
-	}
-
-	a := strings.Join(act, ",")
-	e := strings.Join(exp, ",")
-	r.Equal(e, a)
+	r.Equal(1, int(plugs[0].(plugtest.Simple)))
+	r.Equal(2, int(plugs[1].(plugtest.Simple)))
 }
 
 func Test_Plugins_PluginFeeder(t *testing.T) {
@@ -38,9 +31,7 @@ func Test_Plugins_PluginFeeder(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		stringPlug("a"),
-		stringPlug("b"),
-		stringPlug("c"),
+		plugtest.Simple(1),
 	}
 
 	fn := plugs.PluginFeeder()
@@ -55,9 +46,7 @@ func Test_Plugins_ScopedPlugins(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		stringPlug("a"),
-		stringPlug("b"),
-		stringPlug("c"),
+		plugtest.Simple(1),
 	}
 
 	act := plugs.ScopedPlugins()
@@ -70,9 +59,8 @@ func Test_Plugins_SetStdio(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		&ioPlug{},
-		&ioPlug{},
-		&ioPlug{},
+		&plugtest.IO{},
+		&plugtest.IO{},
 	}
 
 	io := iox.IO{}
@@ -80,7 +68,7 @@ func Test_Plugins_SetStdio(t *testing.T) {
 	r.NoError(err)
 
 	for _, p := range plugs {
-		ip, ok := p.(*ioPlug)
+		ip, ok := p.(*plugtest.IO)
 		r.True(ok)
 		r.Equal(io, ip.IO)
 	}
@@ -93,7 +81,7 @@ func Test_Plugins_WithPlugins(t *testing.T) {
 		r := require.New(t)
 
 		plugs := Plugins{
-			&needFeedPlug{},
+			&plugtest.Needer{},
 		}
 
 		err := plugs.WithPlugins(nil)
@@ -103,10 +91,10 @@ func Test_Plugins_WithPlugins(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		r := require.New(t)
 		plugs := Plugins{
-			stringPlug("a"),
-			&needFeedPlug{},
-			&needFeedPlug{},
-			&needFeedPlug{},
+			plugtest.Simple(1),
+			&plugtest.Needer{},
+			&plugtest.Needer{},
+			&plugtest.Needer{},
 		}
 
 		fn := func() Plugins {
@@ -117,12 +105,12 @@ func Test_Plugins_WithPlugins(t *testing.T) {
 		r.NoError(err)
 
 		for _, p := range plugs {
-			ip, ok := p.(*needFeedPlug)
+			ip, ok := p.(*plugtest.Needer)
 			if !ok {
 				continue
 			}
 
-			fn := ip.PluginFeeder()
+			fn := ip.Fn
 			r.NotNil(fn)
 
 			act := fn()
@@ -139,7 +127,7 @@ func Test_Plugins_SetFileSystem(t *testing.T) {
 		r := require.New(t)
 
 		plugs := Plugins{
-			&fsPlug{},
+			&plugtest.FSable{},
 		}
 
 		err := plugs.SetFileSystem(nil)
@@ -151,9 +139,9 @@ func Test_Plugins_SetFileSystem(t *testing.T) {
 		r := require.New(t)
 
 		plugs := Plugins{
-			stringPlug("a"),
-			&fsPlug{},
-			&fsPlug{},
+			plugtest.Simple(1),
+			&plugtest.FSable{},
+			&plugtest.FSable{},
 		}
 
 		fs := fstest.MapFS{}
@@ -161,7 +149,7 @@ func Test_Plugins_SetFileSystem(t *testing.T) {
 		r.NoError(err)
 
 		for _, p := range plugs {
-			ip, ok := p.(*fsPlug)
+			ip, ok := p.(*plugtest.FSable)
 			if !ok {
 				continue
 			}
@@ -176,8 +164,8 @@ func Test_Plugins_Find(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		stringPlug("a"),
-		stringPlug("b"),
+		plugtest.Simple(1),
+		plugtest.Simple(2),
 	}
 
 	fn := func(plugs Plugins) (Plugins, error) {
@@ -196,25 +184,12 @@ func Test_Plugins_Available(t *testing.T) {
 	r := require.New(t)
 
 	plugs := Plugins{
-		intPlug(1),
-		availPlug("a/b/c/d.md"),
-		availPlug("a/b/e.md"),
-		availPlug("x/y/z.md"),
+		plugtest.AvailabilityChecker(true),
+		plugtest.AvailabilityChecker(false),
+		plugtest.AvailabilityChecker(true),
+		plugtest.AvailabilityChecker(false),
 	}
 
 	act := plugs.Available("a/b")
-	r.Len(act, 3)
-
-	ip, ok := act[0].(intPlug)
-	r.True(ok)
-	r.Equal(1, int(ip))
-
-	ap, ok := act[1].(availPlug)
-	r.True(ok)
-	r.Equal("a/b/c/d.md", string(ap))
-
-	ap, ok = act[2].(availPlug)
-	r.True(ok)
-	r.Equal("a/b/e.md", string(ap))
-
+	r.Len(act, 2)
 }
