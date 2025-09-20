@@ -93,7 +93,9 @@ func printFlags(w io.Writer, p plugins.Plugin) error {
 func printPlugins(w io.Writer, main plugins.Plugin) error {
 	mm := map[string]plugins.Plugin{}
 
-	usingPlugins(main, mm)
+	if err := usingPlugins(main, mm); err != nil {
+		return err
+	}
 
 	if len(mm) == 0 {
 		return nil

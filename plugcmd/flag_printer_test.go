@@ -15,7 +15,10 @@ func Test_FlagPrinterFn(t *testing.T) {
 
 	exp := "fun with flags"
 	fn := FlagPrinterFn(func(w io.Writer) error {
-		w.Write([]byte(exp))
+		_, err := w.Write([]byte(exp))
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 

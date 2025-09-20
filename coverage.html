@@ -1,0 +1,1407 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>plugins: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/markbates/plugins/finder.go (100.0%)</option>
+				
+				<option value="file1">github.com/markbates/plugins/io.go (90.9%)</option>
+				
+				<option value="file2">github.com/markbates/plugins/plugcmd/aliaser.go (100.0%)</option>
+				
+				<option value="file3">github.com/markbates/plugins/plugcmd/commander.go (100.0%)</option>
+				
+				<option value="file4">github.com/markbates/plugins/plugcmd/describer.go (100.0%)</option>
+				
+				<option value="file5">github.com/markbates/plugins/plugcmd/find.go (94.7%)</option>
+				
+				<option value="file6">github.com/markbates/plugins/plugcmd/flag_printer.go (100.0%)</option>
+				
+				<option value="file7">github.com/markbates/plugins/plugcmd/flagger.go (100.0%)</option>
+				
+				<option value="file8">github.com/markbates/plugins/plugcmd/flags.go (100.0%)</option>
+				
+				<option value="file9">github.com/markbates/plugins/plugcmd/namer.go (100.0%)</option>
+				
+				<option value="file10">github.com/markbates/plugins/plugcmd/plugprint.go (76.0%)</option>
+				
+				<option value="file11">github.com/markbates/plugins/plugcmd/sub_commander.go (0.0%)</option>
+				
+				<option value="file12">github.com/markbates/plugins/plugcmd/usage_printer.go (0.0%)</option>
+				
+				<option value="file13">github.com/markbates/plugins/plugins.go (83.6%)</option>
+				
+				<option value="file14">github.com/markbates/plugins/plugtest/availability.go (0.0%)</option>
+				
+				<option value="file15">github.com/markbates/plugins/plugtest/feeder.go (0.0%)</option>
+				
+				<option value="file16">github.com/markbates/plugins/plugtest/fs.go (0.0%)</option>
+				
+				<option value="file17">github.com/markbates/plugins/plugtest/io.go (0.0%)</option>
+				
+				<option value="file18">github.com/markbates/plugins/plugtest/manager.go (0.0%)</option>
+				
+				<option value="file19">github.com/markbates/plugins/plugtest/needer.go (0.0%)</option>
+				
+				<option value="file20">github.com/markbates/plugins/plugtest/scoper.go (0.0%)</option>
+				
+				<option value="file21">github.com/markbates/plugins/plugtest/simple.go (0.0%)</option>
+				
+				<option value="file22">github.com/markbates/plugins/plugtest/string.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package plugins
+
+import (
+        "path"
+)
+
+// Findable can be implemented to find plugins
+type Findable interface {
+        Find(plugs Plugins) (Plugins, error)
+}
+
+// FinderFn is a function that can be used
+// to find plugins. It implements the Finder
+// interface.
+type FinderFn func(plugs Plugins) (Plugins, error)
+
+// Find plugins using the underlying function.
+func (f FinderFn) Find(plugs Plugins) (Plugins, error) <span class="cov2" title="2">{
+        return f(plugs)
+}</span>
+
+// Background finder that will search for a
+// plugin based on the plugin's name.
+func Background(name string) Findable <span class="cov2" title="2">{
+        fn := func(plugs Plugins) (Plugins, error) </span><span class="cov2" title="2">{
+                var res Plugins
+
+                for _, p := range plugs </span><span class="cov6" title="8">{
+                        if name == p.PluginName() </span><span class="cov1" title="1">{
+                                res = append(res, p)
+                                continue</span>
+                        }
+
+                        <span class="cov6" title="7">if name == path.Base(p.PluginName()) </span><span class="cov1" title="1">{
+                                res = append(res, p)
+                                continue</span>
+                        }
+                }
+
+                <span class="cov2" title="2">return res, nil</span>
+        }
+
+        <span class="cov2" title="2">return FinderFn(fn)</span>
+}
+
+// ByType finder can be used to find plugins
+// by their type.
+func ByType[T any](plugs Plugins) []T <span class="cov6" title="7">{
+        var res []T
+
+        for _, p := range plugs </span><span class="cov10" title="27">{
+                if plug, ok := p.(T); ok </span><span class="cov9" title="19">{
+                        res = append(res, plug)
+                }</span>
+        }
+
+        <span class="cov6" title="7">return res</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package plugins
+
+import (
+        "io"
+        "os"
+        "slices"
+
+        "github.com/markbates/iox"
+)
+
+type IO = iox.IO
+
+// IOable can be implemented to return an IO.
+type IOable interface {
+        Plugin
+        iox.IOable
+}
+
+// IOSetable can be implemented to receive an IO.
+type IOSetable interface {
+        Plugin
+        iox.IOSetable
+}
+
+type Stderrer interface {
+        Plugin
+        iox.Stderrer
+}
+
+type Stdiner interface {
+        Plugin
+        iox.Stdiner
+}
+
+type Stdioer interface {
+        Plugin
+        iox.Stdioer
+}
+
+type Stdouter interface {
+        Plugin
+        iox.Stdouter
+}
+
+// Stdout returns a io.MultiWriter containing all
+// plugins that implement Outer. If none are found,
+// then os.Stdout is returned
+func Stdout(plugs ...Plugin) io.Writer <span class="cov6" title="2">{
+        if len(plugs) == 0 </span><span class="cov1" title="1">{
+                return os.Stdout
+        }</span>
+
+        <span class="cov1" title="1">outs := ByType[Stdouter](plugs)
+        writers := make([]io.Writer, 0, len(outs))
+        for _, p := range outs </span><span class="cov10" title="3">{
+                writers = append(writers, p.Stdout())
+        }</span>
+
+        // Use slices.Compact to remove any nil writers
+        <span class="cov1" title="1">writers = slices.DeleteFunc(writers, func(w io.Writer) bool </span><span class="cov10" title="3">{
+                return w == nil
+        }</span>)
+
+        <span class="cov1" title="1">if len(writers) == 0 </span><span class="cov0" title="0">{
+                return os.Stdout
+        }</span>
+
+        <span class="cov1" title="1">return io.MultiWriter(writers...)</span>
+}
+
+// Stderr returns a io.MultiWriter containing all
+// plugins that implement Outer. If none are found,
+// then os.Stderr is returned
+func Stderr(plugs ...Plugin) io.Writer <span class="cov6" title="2">{
+        if len(plugs) == 0 </span><span class="cov1" title="1">{
+                return os.Stderr
+        }</span>
+
+        <span class="cov1" title="1">outs := ByType[Stderrer](plugs)
+        writers := make([]io.Writer, 0, len(outs))
+        for _, p := range outs </span><span class="cov10" title="3">{
+                writers = append(writers, p.Stderr())
+        }</span>
+
+        // Use slices.Compact to remove any nil writers
+        <span class="cov1" title="1">writers = slices.DeleteFunc(writers, func(w io.Writer) bool </span><span class="cov10" title="3">{
+                return w == nil
+        }</span>)
+
+        <span class="cov1" title="1">if len(writers) == 0 </span><span class="cov0" title="0">{
+                return os.Stderr
+        }</span>
+
+        <span class="cov1" title="1">return io.MultiWriter(writers...)</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package plugcmd
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+// Aliaser is a command that provides aliases for itself
+type Aliaser interface {
+        plugins.Plugin
+        CmdAliases() []string
+}
+
+var _ Aliaser = AliaserFn(nil)
+
+// AliaserFn is a function that can be used to implement the Aliaser interface
+type AliaserFn func() []string
+
+func (fn AliaserFn) CmdAliases() []string <span class="cov8" title="1">{
+        return fn()
+}</span>
+
+func (fn AliaserFn) PluginName() string <span class="cov8" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package plugcmd
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+// Commander is a plugin that is meant to be the beginning of
+// a CLI application
+type Commander interface {
+        plugins.Plugin
+        Main(ctx context.Context, root string, args []string) error
+}
+
+var _ Commander = CommanderFn(nil)
+
+// CommanderFn is a function that can be used to implement the Commander interface
+type CommanderFn func(ctx context.Context, root string, args []string) error
+
+func (fn CommanderFn) Main(ctx context.Context, root string, args []string) error <span class="cov8" title="1">{
+        return fn(ctx, root, args)
+}</span>
+
+func (fn CommanderFn) PluginName() string <span class="cov8" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+
+type NamedCommander interface {
+        Commander
+        Namer
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package plugcmd
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+// Describer is called by `Print` and can be
+// implemented to print a short, single line,
+// description of the plugin. `-h`
+type Describer interface {
+        plugins.Plugin
+        Description() string
+}
+
+var _ Describer = DescriberFn(nil)
+
+// DescriberFn is a function that can be used to implement the Describer interface
+type DescriberFn func() string
+
+func (fn DescriberFn) Description() string <span class="cov8" title="1">{
+        return fn()
+}</span>
+
+func (fn DescriberFn) PluginName() string <span class="cov8" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package plugcmd
+
+import (
+        "path"
+        "strings"
+
+        "github.com/markbates/plugins"
+)
+
+// FindFromArgs uses the first arg that does not begin with `-`
+// as the name argument for Find
+func FindFromArgs(args []string, plugs plugins.Plugins) Commander <span class="cov4" title="2">{
+        for _, a := range args </span><span class="cov4" title="2">{
+                if strings.HasPrefix(a, "-") </span><span class="cov1" title="1">{
+                        continue</span>
+                }
+                <span class="cov1" title="1">return Find(a, plugs)</span>
+        }
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+// Find wraps the other cmd finders into a mega finder for cmds
+func Find(name string, plugs plugins.Plugins) Commander <span class="cov10" title="5">{
+        if len(plugs) == 0 </span><span class="cov1" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov8" title="4">cmds := plugins.ByType[Commander](plugs)
+
+        for _, c := range cmds </span><span class="cov8" title="4">{
+                if n, ok := c.(Namer); ok </span><span class="cov8" title="4">{
+                        if n.CmdName() == name </span><span class="cov1" title="1">{
+                                return c
+                        }</span>
+                }
+
+                <span class="cov7" title="3">if n, ok := c.(Aliaser); ok </span><span class="cov7" title="3">{
+                        for _, a := range n.CmdAliases() </span><span class="cov4" title="2">{
+                                if a == name </span><span class="cov1" title="1">{
+                                        return c
+                                }</span>
+                        }
+                }
+
+                <span class="cov4" title="2">if name == path.Base(c.PluginName()) </span><span class="cov4" title="2">{
+                        return c
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package plugcmd
+
+import (
+        "fmt"
+        "io"
+
+        "github.com/markbates/plugins"
+)
+
+type FlagPrinter interface {
+        plugins.Plugin
+        PrintFlags(w io.Writer) error
+}
+
+var _ FlagPrinter = FlagPrinterFn(nil)
+
+// FlagPrinterFn is a function that can be used to implement the FlagPrinter interface
+type FlagPrinterFn func(w io.Writer) error
+
+func (fn FlagPrinterFn) PrintFlags(w io.Writer) error <span class="cov8" title="1">{
+        return fn(w)
+}</span>
+
+func (fn FlagPrinterFn) PluginName() string <span class="cov8" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package plugcmd
+
+import (
+        "flag"
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+type Flagger interface {
+        plugins.Plugin
+        Flags() (*flag.FlagSet, error)
+}
+
+var _ Flagger = FlaggerFn(nil)
+
+// FlaggerFn is a function that can be used to implement the Flagger interface
+type FlaggerFn func() (*flag.FlagSet, error)
+
+func (fn FlaggerFn) Flags() (*flag.FlagSet, error) <span class="cov8" title="1">{
+        return fn()
+}</span>
+
+func (fn FlaggerFn) PluginName() string <span class="cov8" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package plugcmd
+
+import (
+        "flag"
+        "fmt"
+        "path"
+
+        "github.com/markbates/plugins"
+)
+
+// SetToSlice takes a flag set and returns a slice
+// of the flags
+func SetToSlice(set *flag.FlagSet) []*flag.Flag <span class="cov1" title="1">{
+        var flags []*flag.Flag
+        set.VisitAll(func(f *flag.Flag) </span><span class="cov10" title="2">{
+                flags = append(flags, f)
+        }</span>)
+        <span class="cov1" title="1">return flags</span>
+}
+
+// CleanFlagSet sanitizes, and namespaces, flags to be used
+// when incorporating flags from other plugins.
+func CleanSet(p plugins.Plugin, set *flag.FlagSet) []*flag.Flag <span class="cov1" title="1">{
+        var flags []*flag.Flag
+        set.VisitAll(func(f *flag.Flag) </span><span class="cov1" title="1">{
+                flags = append(flags, f)
+        }</span>)
+        <span class="cov1" title="1">return Clean(p, flags)</span>
+}
+
+// CleanFlags sanitizes, and namespaces, flags to be used
+// when incorporating flags from other plugins.
+func Clean(p plugins.Plugin, flags []*flag.Flag) []*flag.Flag <span class="cov10" title="2">{
+        fls := make([]*flag.Flag, len(flags))
+        for i, f := range flags </span><span class="cov10" title="2">{
+                fls[i] = &amp;flag.Flag{
+                        DefValue: f.DefValue,
+                        Name:     fmt.Sprintf("%s-%s", path.Base(name(p)), f.Name),
+                        Usage:    f.Usage,
+                        Value:    f.Value,
+                }
+        }</span>
+        <span class="cov10" title="2">return fls</span>
+}
+
+func name(p plugins.Plugin) string <span class="cov10" title="2">{
+        if c, ok := p.(Namer); ok </span><span class="cov1" title="1">{
+                return c.CmdName()
+        }</span>
+        <span class="cov1" title="1">return p.PluginName()</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package plugcmd
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+// Namer is a command that provides a different name for the
+// command than the name of the Plugin
+type Namer interface {
+        plugins.Plugin
+        CmdName() string
+}
+
+var _ Namer = NamerFn(nil)
+
+// NamerFn is a function that can be used to implement the Namer interface
+type NamerFn func() string
+
+func (fn NamerFn) CmdName() string <span class="cov10" title="2">{
+        return fn()
+}</span>
+
+func (fn NamerFn) PluginName() string <span class="cov1" title="1">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package plugcmd
+
+import (
+        "bytes"
+        "fmt"
+        "io"
+        "path"
+        "reflect"
+        "sort"
+        "strings"
+        "text/tabwriter"
+
+        "github.com/markbates/plugins"
+)
+
+// Print will try and print a helpful Usage printing
+// of the plugin and any plugins that are provided.
+//
+//        $ foobar
+//        ---------
+//
+//        Usage of foobar:
+//        -h, --help   print this help
+//
+//        Available Commands:
+//                foobar info     Print diagnostic information (useful for debugging)
+//                foobar version  Print the version information
+func Print(w io.Writer, main plugins.Plugin) error <span class="cov1" title="1">{
+
+        header := strings.TrimSpace(cmdName(main))
+        header = fmt.Sprintf("$ %s", header)
+        fmt.Fprintln(w, header)
+        for i := 0; i &lt; len(header); i++ </span><span class="cov10" title="6">{
+                fmt.Fprint(w, "-")
+        }</span>
+        <span class="cov1" title="1">fmt.Fprintf(w, "\n%s\n", typeName(main))
+
+        if u, ok := main.(UsagePrinter); ok </span><span class="cov1" title="1">{
+                fmt.Fprintln(w)
+                if err := u.PrintUsage(w); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov1" title="1">fmt.Fprintln(w)</span>
+        }
+
+        <span class="cov1" title="1">if a, ok := main.(Aliaser); ok </span><span class="cov1" title="1">{
+                aliases := a.CmdAliases()
+                if len(aliases) != 0 </span><span class="cov1" title="1">{
+                        const al = "\nAliases:\n"
+                        fmt.Fprint(w, al)
+                        fmt.Fprintln(w, strings.Join(aliases, ", "))
+                }</span>
+        }
+
+        <span class="cov1" title="1">if err := printFlags(w, main); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">if err := printCommands(w, main); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">if err := printPlugins(w, main); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func printFlags(w io.Writer, p plugins.Plugin) error <span class="cov1" title="1">{
+        if u, ok := p.(FlagPrinter); ok </span><span class="cov1" title="1">{
+                // fmt.Fprintln(w)
+                fmt.Fprintln(w, "\nFlags:")
+                return u.PrintFlags(w)
+        }</span>
+
+        <span class="cov0" title="0">if u, ok := p.(Flagger); ok </span><span class="cov0" title="0">{
+                flags, err := u.Flags()
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">ow := flags.Output()
+                flags.SetOutput(w)
+                fmt.Fprintln(w)
+                flags.Usage()
+                flags.SetOutput(ow)</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func printPlugins(w io.Writer, main plugins.Plugin) error <span class="cov1" title="1">{
+        mm := map[string]plugins.Plugin{}
+
+        if err := usingPlugins(main, mm); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">if len(mm) == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">plugs := make(plugins.Plugins, 0, len(mm))
+        for _, p := range mm </span><span class="cov4" title="2">{
+                plugs = append(plugs, p)
+        }</span>
+
+        <span class="cov1" title="1">sort.Slice(plugs, func(i, j int) bool </span><span class="cov1" title="1">{
+                return plugs[i].PluginName() &lt; plugs[j].PluginName()
+        }</span>)
+
+        <span class="cov1" title="1">fmt.Fprintln(w, "\nUsing Plugins:")
+        tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+        fmt.Fprintf(tw, "\t%s\t%s\t%s\n", "Name", "Description", "Type")
+        fmt.Fprintf(tw, "\t%s\t%s\t%s\n", "----", "-----------", "----")
+        for _, p := range plugs </span><span class="cov4" title="2">{
+                fmt.Fprintf(tw, "\t%s\t%s\t%s\n", p.PluginName(), desc(p), typeName(p))
+        }</span>
+
+        <span class="cov1" title="1">tw.Flush()
+        return nil</span>
+}
+
+func typeName(p plugins.Plugin) string <span class="cov6" title="3">{
+        rv := reflect.Indirect(reflect.ValueOf(p))
+        rt := reflect.TypeOf(rv.Interface())
+
+        bb := &amp;bytes.Buffer{}
+
+        t := fmt.Sprintf("%T", p)
+        if strings.HasPrefix(t, "*") </span><span class="cov0" title="0">{
+                fmt.Fprint(bb, "*")
+                t = strings.TrimPrefix(t, "*")
+        }</span>
+        <span class="cov6" title="3">fmt.Fprintf(bb, "%s/", path.Dir(rt.PkgPath()))
+        fmt.Fprint(bb, t)
+
+        return bb.String()</span>
+}
+
+func usingPlugins(plug plugins.Plugin, mm map[string]plugins.Plugin) error <span class="cov1" title="1">{
+        if mm == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("mm cannot be nil")
+        }</span>
+
+        <span class="cov1" title="1">wp, ok := plug.(plugins.Scoper)
+        if !ok </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">plugs := wp.ScopedPlugins()
+
+        for _, p := range plugs </span><span class="cov4" title="2">{
+                mm[p.PluginName()] = p
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func printCommands(w io.Writer, main plugins.Plugin) error <span class="cov1" title="1">{
+        sc, ok := main.(SubCommander)
+        if !ok </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">plugs := sc.SubCommands()
+        if len(plugs) == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">sort.Slice(plugs, func(i, j int) bool </span><span class="cov4" title="2">{
+                return plugs[i].PluginName() &lt; plugs[j].PluginName()
+        }</span>)
+
+        <span class="cov1" title="1">const ac = "\nAvailable Commands:\n"
+        fmt.Fprint(w, ac)
+
+        tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+        fmt.Fprintf(tw, "\t%s\t%s\n", "Command", "Description")
+        fmt.Fprintf(tw, "\t%s\t%s\n", "-------", "-----------")
+        for _, c := range plugs </span><span class="cov6" title="3">{
+                line := fmt.Sprintf("\t%s", cmdName(c))
+                if d := desc(c); d != "" </span><span class="cov6" title="3">{
+                        line = fmt.Sprintf("%s\t%s", line, d)
+                }</span>
+                <span class="cov6" title="3">fmt.Fprintln(tw, line)</span>
+        }
+
+        <span class="cov1" title="1">tw.Flush()
+        return nil</span>
+}
+
+func desc(p plugins.Plugin) string <span class="cov9" title="5">{
+        if d, ok := p.(Describer); ok </span><span class="cov9" title="5">{
+                return d.Description()
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+
+func cmdName(p plugins.Plugin) string <span class="cov7" title="4">{
+        if d, ok := p.(Namer); ok </span><span class="cov0" title="0">{
+                return d.CmdName()
+        }</span>
+        <span class="cov7" title="4">return path.Base(p.PluginName())</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package plugcmd
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+// SubCommander can be implemented to provide a list of plugins.Plugin
+// that can be used as sub-commands of the current Plugin
+type SubCommander interface {
+        plugins.Plugin
+        SubCommands() []Commander
+}
+
+var _ SubCommander = SubCommanderFn(nil)
+
+// SubCommanderFn is a function that can be used to implement the SubCommander interface
+type SubCommanderFn func() []Commander
+
+func (fn SubCommanderFn) SubCommands() []Commander <span class="cov0" title="0">{
+        return fn()
+}</span>
+
+func (fn SubCommanderFn) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package plugcmd
+
+import (
+        "fmt"
+        "io"
+
+        "github.com/markbates/plugins"
+)
+
+// UsagePrinter is called by `Print` and can be implemented
+// to print a large block of usage information after the
+// `Describer` interface is called. This is useful for printing
+// flag information, links, and other messages to users.
+type UsagePrinter interface {
+        plugins.Plugin
+        PrintUsage(w io.Writer) error
+}
+
+var _ UsagePrinter = UsagePrinterFn(nil)
+
+// UsagePrinterFn is a function that can be used to implement the UsagePrinter interface
+type UsagePrinterFn func(w io.Writer) error
+
+func (fn UsagePrinterFn) PrintUsage(w io.Writer) error <span class="cov0" title="0">{
+        return fn(w)
+}</span>
+
+func (fn UsagePrinterFn) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", fn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">// Package plugins provides a flexible and extensible plugin system for Go applications.
+//
+// The core concept revolves around the Plugin interface, which provides
+// a name for identification. Additional interfaces like Needer, Feeder,
+// AvailabilityChecker, IOSetable, and FSSetable extend functionality.
+//
+// # Basic Usage
+//
+// Create plugins by implementing the Plugin interface and any additional
+// specialized interfaces:
+//
+//        type MyPlugin struct {
+//                name string
+//        }
+//
+//        func (p MyPlugin) PluginName() string {
+//                return p.name
+//        }
+//
+// Manage a collection of plugins using the Plugins slice type:
+//
+//        plugs := plugins.Plugins{
+//                MyPlugin{name: "plugin1"},
+//                MyPlugin{name: "plugin2"},
+//        }
+//
+//        // Find plugins by type
+//        myPlugins := plugins.ByType[MyPlugin](plugs)
+//
+//        // Check availability
+//        available := plugs.Available("/some/path")
+//
+//        // Configure I/O and filesystem
+//        err := plugs.SetStdio(someIO)
+//        err = plugs.SetFileSystem(someFS)
+//
+// # Plugin Types
+//
+// The package provides several specialized plugin interfaces:
+//
+//   - Plugin: Basic interface that all plugins must implement
+//   - Scoper: Plugins that can return scoped plugin collections
+//   - Feeder/Needer: Plugin communication and dependency injection
+//   - AvailabilityChecker: Runtime availability checking
+//   - IOSetable/FSSetable: I/O and filesystem configuration
+//
+// See the plugcmd subpackage for command-line specific plugin interfaces.
+package plugins
+
+import (
+        "fmt"
+        "io/fs"
+        "log/slog"
+)
+
+var _ FSSetable = Plugins{}
+var _ Feeder = Plugins{}
+var _ IOSetable = Plugins{}
+var _ Scoper = Plugins{}
+
+// Plugins is a slice of type `Plugin` that provides
+// additional useful functionality.
+type Plugins []Plugin
+
+// Len is the number of elements in the collection.
+func (plugs Plugins) Len() int <span class="cov1" title="1">{
+        return len(plugs)
+}</span>
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (plugs Plugins) Less(i int, j int) bool <span class="cov1" title="1">{
+        return plugs[i].PluginName() &lt; plugs[j].PluginName()
+}</span>
+
+// Swap swaps the elements with indexes i and j.
+func (plugs Plugins) Swap(i int, j int) <span class="cov1" title="1">{
+        plugs[i], plugs[j] = plugs[j], plugs[i]
+}</span>
+
+func (plugs Plugins) PluginFeeder() FeederFn <span class="cov1" title="1">{
+        return func() Plugins </span><span class="cov1" title="1">{
+                return plugs
+        }</span>
+}
+
+// ScopedPlugins implements Scoper, return itself.
+func (plugs Plugins) ScopedPlugins() Plugins <span class="cov1" title="1">{
+        return plugs
+}</span>
+
+// SetStdio for those plugins that implement
+// IOSetable.
+func (plugs Plugins) SetStdio(io IO) error <span class="cov1" title="1">{
+        ios := ByType[IOSetable](plugs)
+
+        for _, p := range ios </span><span class="cov4" title="2">{
+                if err := p.SetStdio(io); err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to set stdio for plugin",
+                                "plugin", p.PluginName(),
+                                "error", err)
+                        return fmt.Errorf("failed to set stdio for plugin %s: %w", p.PluginName(), err)
+                }</span>
+        }
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+// WithPlugins will call any Needer plugins with the
+// Feeder function.
+func (plugs Plugins) WithPlugins(fn FeederFn) error <span class="cov4" title="2">{
+        if fn == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("no FeederFn provided")
+        }</span>
+
+        <span class="cov1" title="1">needers := ByType[Needer](plugs)
+
+        for _, n := range needers </span><span class="cov6" title="3">{
+                if err := n.WithPlugins(fn); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to set plugins for needer %s: %w", n.PluginName(), err)
+                }</span>
+        }
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+// SetFS for those plugins that implement FSSetable.
+func (plugs Plugins) SetFileSystem(fs fs.FS) error <span class="cov4" title="2">{
+        if fs == nil </span><span class="cov1" title="1">{
+                return fmt.Errorf("no fs.FS provided")
+        }</span>
+
+        <span class="cov1" title="1">fsps := ByType[FSSetable](plugs)
+
+        for _, p := range fsps </span><span class="cov4" title="2">{
+                if err := p.SetFileSystem(fs); err != nil </span><span class="cov0" title="0">{
+                        slog.Error("failed to set filesystem for plugin",
+                                "plugin", p.PluginName(),
+                                "error", err)
+                        return fmt.Errorf("failed to set filesystem for plugin %s: %w", p.PluginName(), err)
+                }</span>
+        }
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+// Find plugins using the given Finder.
+func (plugs Plugins) Find(fn FinderFn) (Plugins, error) <span class="cov1" title="1">{
+        return fn(plugs)
+}</span>
+
+// Available will return plugins that are available
+// to be used at the given root. By default, all
+// plugins are available. The AvailabilityChecker
+// interface can be implemented to give the plugin
+// the ability to check if it is available.
+func (plugs Plugins) Available(root string) Plugins <span class="cov1" title="1">{
+        var res Plugins
+
+        for _, p := range plugs </span><span class="cov7" title="4">{
+                ac, ok := p.(AvailabilityChecker)
+                if !ok </span><span class="cov0" title="0">{
+                        res = append(res, p)
+                        continue</span>
+                }
+
+                <span class="cov7" title="4">if ac.PluginAvailable(root) </span><span class="cov4" title="2">{
+                        res = append(res, p)
+                }</span>
+        }
+
+        <span class="cov1" title="1">return res</span>
+}
+
+func (plugs Plugins) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", plugs)
+}</span>
+
+// Validate checks the plugins collection for common issues.
+// It verifies that no duplicate plugin names exist and that
+// all plugins have valid names.
+func (plugs Plugins) Validate() error <span class="cov7" title="4">{
+        if len(plugs) == 0 </span><span class="cov1" title="1">{
+                return fmt.Errorf("no plugins provided")
+        }</span>
+
+        <span class="cov6" title="3">names := make(map[string]bool, len(plugs))
+        for i, plugin := range plugs </span><span class="cov10" title="6">{
+                if plugin == nil </span><span class="cov1" title="1">{
+                        return fmt.Errorf("plugin at index %d is nil", i)
+                }</span>
+
+                <span class="cov9" title="5">name := plugin.PluginName()
+                if name == "" </span><span class="cov0" title="0">{
+                        return fmt.Errorf("plugin at index %d has empty name", i)
+                }</span>
+
+                <span class="cov9" title="5">if names[name] </span><span class="cov1" title="1">{
+                        return fmt.Errorf("duplicate plugin name: %s", name)
+                }</span>
+                <span class="cov7" title="4">names[name] = true</span>
+        }
+        <span class="cov1" title="1">return nil</span>
+}
+
+// Names returns a slice of all plugin names in the collection.
+func (plugs Plugins) Names() []string <span class="cov1" title="1">{
+        names := make([]string, 0, len(plugs))
+        for _, p := range plugs </span><span class="cov6" title="3">{
+                names = append(names, p.PluginName())
+        }</span>
+        <span class="cov1" title="1">return names</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package plugtest
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.AvailabilityChecker = AvailabilityChecker(false)
+
+type AvailabilityChecker bool
+
+func (a AvailabilityChecker) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", a)
+}</span>
+
+func (a AvailabilityChecker) PluginAvailable(root string) bool <span class="cov0" title="0">{
+        return bool(a)
+}</span>
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package plugtest
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.Feeder = &amp;Feeder{}
+
+type Feeder struct {
+        Plugins plugins.Plugins
+}
+
+func (f *Feeder) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", f)
+}</span>
+
+func (f *Feeder) PluginFeeder() plugins.FeederFn <span class="cov0" title="0">{
+        if f == nil </span><span class="cov0" title="0">{
+                return func() plugins.Plugins </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return func() plugins.Plugins </span><span class="cov0" title="0">{
+                return f.Plugins
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package plugtest
+
+import (
+        "fmt"
+        "io/fs"
+        "sync"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.FSSetable = &amp;FSable{}
+var _ plugins.FSable = &amp;FSable{}
+
+type FSable struct {
+        FS fs.FS
+
+        mu sync.Mutex
+}
+
+func (f *FSable) FileSystem() (fs.FS, error) <span class="cov0" title="0">{
+        if f == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("FSable instance cannot be nil")
+        }</span>
+
+        <span class="cov0" title="0">if f.FS == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("no filesystem configured")
+        }</span>
+
+        <span class="cov0" title="0">return f.FS, nil</span>
+}
+
+func (f *FSable) SetFileSystem(fs fs.FS) error <span class="cov0" title="0">{
+        if f == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("FSable instance cannot be nil")
+        }</span>
+
+        <span class="cov0" title="0">if fs == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("filesystem cannot be nil")
+        }</span>
+
+        <span class="cov0" title="0">f.mu.Lock()
+        defer f.mu.Unlock()
+
+        f.FS = fs
+        return nil</span>
+}
+
+func (f *FSable) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", f)
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package plugtest
+
+import (
+        "fmt"
+        "io"
+        "os"
+
+        "github.com/markbates/iox"
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.IOSetable = &amp;IO{}
+var _ plugins.IOable = &amp;IO{}
+var _ plugins.Stderrer = &amp;IO{}
+var _ plugins.Stdiner = &amp;IO{}
+var _ plugins.Stdouter = &amp;IO{}
+
+type IO struct {
+        IO plugins.IO
+}
+
+func (i *IO) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", i)
+}</span>
+
+func (i *IO) SetStdio(io plugins.IO) error <span class="cov0" title="0">{
+        if i == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("nil IO")
+        }</span>
+
+        <span class="cov0" title="0">i.IO = io
+        return nil</span>
+}
+
+func (i *IO) Stdio() plugins.IO <span class="cov0" title="0">{
+        if i == nil </span><span class="cov0" title="0">{
+                return iox.IO{}
+        }</span>
+
+        <span class="cov0" title="0">return i.IO</span>
+}
+
+func (i *IO) Stderr() io.Writer <span class="cov0" title="0">{
+        if i == nil </span><span class="cov0" title="0">{
+                return os.Stderr
+        }</span>
+
+        <span class="cov0" title="0">return i.IO.Stderr()</span>
+}
+
+func (i *IO) Stdin() io.Reader <span class="cov0" title="0">{
+        if i == nil </span><span class="cov0" title="0">{
+                return os.Stdin
+        }</span>
+
+        <span class="cov0" title="0">return i.IO.Stdin()</span>
+}
+
+func (i *IO) Stdout() io.Writer <span class="cov0" title="0">{
+        if i == nil </span><span class="cov0" title="0">{
+                return os.Stdout
+        }</span>
+
+        <span class="cov0" title="0">return i.IO.Stdout()</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package plugtest
+
+import (
+        "fmt"
+        "sync"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.Needer = &amp;Manager{}
+var _ plugins.Feeder = &amp;Manager{}
+var _ plugins.Scoper = &amp;Manager{}
+
+type Manager struct {
+        FeederFn plugins.FeederFn
+
+        mu sync.RWMutex
+}
+
+func (m *Manager) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", m)
+}</span>
+
+func (m *Manager) WithPlugins(fn plugins.FeederFn) error <span class="cov0" title="0">{
+        if m == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("manager cannot be nil")
+        }</span>
+
+        <span class="cov0" title="0">if fn == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("feeder function cannot be nil")
+        }</span>
+
+        <span class="cov0" title="0">m.mu.Lock()
+        defer m.mu.Unlock()
+
+        m.FeederFn = fn
+        return nil</span>
+}
+
+func (m *Manager) PluginFeeder() plugins.FeederFn <span class="cov0" title="0">{
+        fn := func() plugins.Plugins </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">if m == nil </span><span class="cov0" title="0">{
+                return fn
+        }</span>
+
+        <span class="cov0" title="0">m.mu.RLock()
+        defer m.mu.RUnlock()
+
+        if m.FeederFn == nil </span><span class="cov0" title="0">{
+                return fn
+        }</span>
+
+        <span class="cov0" title="0">return m.FeederFn</span>
+}
+
+func (m *Manager) ScopedPlugins() plugins.Plugins <span class="cov0" title="0">{
+        return m.PluginFeeder()()
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package plugtest
+
+import (
+        "fmt"
+        "sync"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.Needer = &amp;Needer{}
+
+type Needer struct {
+        Fn plugins.FeederFn
+
+        mu sync.Mutex
+}
+
+func (n *Needer) PluginName() string <span class="cov0" title="0">{
+        return "plugtest.Needer"
+}</span>
+
+func (n *Needer) WithPlugins(p plugins.FeederFn) error <span class="cov0" title="0">{
+        if n == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("nil Needer")
+        }</span>
+
+        <span class="cov0" title="0">if p == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("nil FeederFn")
+        }</span>
+
+        <span class="cov0" title="0">n.mu.Lock()
+        defer n.mu.Unlock()
+
+        n.Fn = p
+
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package plugtest
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.Scoper = &amp;Scoper{}
+
+type Scoper struct {
+        Plugins plugins.Plugins
+}
+
+func (s *Scoper) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T", s)
+}</span>
+
+func (s *Scoper) ScopedPlugins() plugins.Plugins <span class="cov0" title="0">{
+        if s == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">return s.Plugins</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package plugtest
+
+import (
+        "fmt"
+
+        "github.com/markbates/plugins"
+)
+
+var _ plugins.Plugin = Simple(0)
+
+type Simple int
+
+func (s Simple) PluginName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%T(%d)", s, int(s))
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package plugtest
+
+type StringPlugin string
+
+func (s StringPlugin) PluginName() string <span class="cov0" title="0">{
+        return string(s)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

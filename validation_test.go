@@ -123,3 +123,72 @@ func BenchmarkPlugins_Available(b *testing.B) {
 		_ = plugs.Available("/some/path")
 	}
 }
+
+func Test_Plugins_Find_WithFunction(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{
+		plugtest.StringPlugin("first"),
+		plugtest.StringPlugin("second"),
+	}
+
+	// Test successful find
+	finder := func(p Plugins) (Plugins, error) {
+		return p[:1], nil // Return first plugin
+	}
+
+	result, err := plugs.Find(finder)
+	r.NoError(err)
+	r.Len(result, 1)
+	r.Equal("first", result[0].PluginName())
+}
+
+func Test_Plugins_Sort_Methods(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{
+		plugtest.StringPlugin("zebra"),
+		plugtest.StringPlugin("alpha"),
+	}
+
+	// Test Len
+	r.Equal(2, plugs.Len())
+
+	// Test Less
+	r.True(plugs.Less(1, 0))  // "alpha" < "zebra"
+	r.False(plugs.Less(0, 1)) // "zebra" > "alpha"
+
+	// Test Swap
+	plugs.Swap(0, 1)
+	r.Equal("alpha", plugs[0].PluginName())
+	r.Equal("zebra", plugs[1].PluginName())
+}
+
+func Test_Plugins_PluginFeeder_Function(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{
+		plugtest.StringPlugin("test"),
+	}
+
+	feeder := plugs.PluginFeeder()
+	r.NotNil(feeder)
+
+	result := feeder()
+	r.Equal(plugs, result)
+}
+
+func Test_Plugins_ScopedPlugins_Method(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{
+		plugtest.StringPlugin("test"),
+	}
+
+	scoped := plugs.ScopedPlugins()
+	r.Equal(plugs, scoped)
+}
