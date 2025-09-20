@@ -1,8 +1,56 @@
+// Package plugins provides a flexible and extensible plugin system for Go applications.
+//
+// The core concept revolves around the Plugin interface, which provides
+// a name for identification. Additional interfaces like Needer, Feeder,
+// AvailabilityChecker, IOSetable, and FSSetable extend functionality.
+//
+// # Basic Usage
+//
+// Create plugins by implementing the Plugin interface and any additional
+// specialized interfaces:
+//
+//	type MyPlugin struct {
+//		name string
+//	}
+//
+//	func (p MyPlugin) PluginName() string {
+//		return p.name
+//	}
+//
+// Manage a collection of plugins using the Plugins slice type:
+//
+//	plugs := plugins.Plugins{
+//		MyPlugin{name: "plugin1"},
+//		MyPlugin{name: "plugin2"},
+//	}
+//
+//	// Find plugins by type
+//	myPlugins := plugins.ByType[MyPlugin](plugs)
+//
+//	// Check availability
+//	available := plugs.Available("/some/path")
+//
+//	// Configure I/O and filesystem
+//	err := plugs.SetStdio(someIO)
+//	err = plugs.SetFileSystem(someFS)
+//
+// # Plugin Types
+//
+// The package provides several specialized plugin interfaces:
+//
+//   - Plugin: Basic interface that all plugins must implement
+//   - Scoper: Plugins that can return scoped plugin collections
+//   - Feeder/Needer: Plugin communication and dependency injection
+//   - AvailabilityChecker: Runtime availability checking
+//   - IOSetable/FSSetable: I/O and filesystem configuration
+//
+// See the plugcmd subpackage for command-line specific plugin interfaces.
 package plugins
 
 import (
 	"fmt"
 	"io/fs"
+	"log/slog"
 )
 
 var _ FSSetable = Plugins{}
@@ -44,12 +92,19 @@ func (plugs Plugins) ScopedPlugins() Plugins {
 // SetStdio for those plugins that implement
 // IOSetable.
 func (plugs Plugins) SetStdio(io IO) error {
+	slog.Debug("setting stdio for plugins", "plugin_count", len(plugs))
+	
 	ios := ByType[IOSetable](plugs)
+	slog.Debug("found plugins implementing IOSetable", "count", len(ios))
 
 	for _, p := range ios {
 		if err := p.SetStdio(io); err != nil {
-			return err
+			slog.Error("failed to set stdio for plugin", 
+				"plugin", p.PluginName(), 
+				"error", err)
+			return fmt.Errorf("failed to set stdio for plugin %s: %w", p.PluginName(), err)
 		}
+		slog.Debug("successfully set stdio for plugin", "plugin", p.PluginName())
 	}
 
 	return nil
@@ -66,7 +121,7 @@ func (plugs Plugins) WithPlugins(fn FeederFn) error {
 
 	for _, n := range needers {
 		if err := n.WithPlugins(fn); err != nil {
-			return err
+			return fmt.Errorf("failed to set plugins for needer %s: %w", n.PluginName(), err)
 		}
 	}
 
@@ -79,12 +134,19 @@ func (plugs Plugins) SetFileSystem(fs fs.FS) error {
 		return fmt.Errorf("no fs.FS provided")
 	}
 
+	slog.Debug("setting filesystem for plugins", "plugin_count", len(plugs))
+	
 	fsps := ByType[FSSetable](plugs)
+	slog.Debug("found plugins implementing FSSetable", "count", len(fsps))
 
 	for _, p := range fsps {
 		if err := p.SetFileSystem(fs); err != nil {
-			return err
+			slog.Error("failed to set filesystem for plugin", 
+				"plugin", p.PluginName(), 
+				"error", err)
+			return fmt.Errorf("failed to set filesystem for plugin %s: %w", p.PluginName(), err)
 		}
+		slog.Debug("successfully set filesystem for plugin", "plugin", p.PluginName())
 	}
 
 	return nil
@@ -120,4 +182,40 @@ func (plugs Plugins) Available(root string) Plugins {
 
 func (plugs Plugins) PluginName() string {
 	return fmt.Sprintf("%T", plugs)
+}
+
+// Validate checks the plugins collection for common issues.
+// It verifies that no duplicate plugin names exist and that
+// all plugins have valid names.
+func (plugs Plugins) Validate() error {
+	if len(plugs) == 0 {
+		return fmt.Errorf("no plugins provided")
+	}
+
+	names := make(map[string]bool, len(plugs))
+	for i, plugin := range plugs {
+		if plugin == nil {
+			return fmt.Errorf("plugin at index %d is nil", i)
+		}
+
+		name := plugin.PluginName()
+		if name == "" {
+			return fmt.Errorf("plugin at index %d has empty name", i)
+		}
+
+		if names[name] {
+			return fmt.Errorf("duplicate plugin name: %s", name)
+		}
+		names[name] = true
+	}
+	return nil
+}
+
+// Names returns a slice of all plugin names in the collection.
+func (plugs Plugins) Names() []string {
+	names := make([]string, 0, len(plugs))
+	for _, p := range plugs {
+		names = append(names, p.PluginName())
+	}
+	return names
 }

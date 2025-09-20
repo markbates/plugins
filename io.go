@@ -3,6 +3,7 @@ package plugins
 import (
 	"io"
 	"os"
+	"slices"
 
 	"github.com/markbates/iox"
 )
@@ -49,14 +50,22 @@ func Stdout(plugs ...Plugin) io.Writer {
 		return os.Stdout
 	}
 
-	var ins []io.Writer
-
 	outs := ByType[Stdouter](plugs)
+	writers := make([]io.Writer, 0, len(outs))
 	for _, p := range outs {
-		ins = append(ins, p.Stdout())
+		writers = append(writers, p.Stdout())
 	}
 
-	return io.MultiWriter(ins...)
+	// Use slices.Compact to remove any nil writers
+	writers = slices.DeleteFunc(writers, func(w io.Writer) bool {
+		return w == nil
+	})
+
+	if len(writers) == 0 {
+		return os.Stdout
+	}
+
+	return io.MultiWriter(writers...)
 }
 
 // Stderr returns a io.MultiWriter containing all
@@ -67,12 +76,20 @@ func Stderr(plugs ...Plugin) io.Writer {
 		return os.Stderr
 	}
 
-	var ins []io.Writer
-
 	outs := ByType[Stderrer](plugs)
+	writers := make([]io.Writer, 0, len(outs))
 	for _, p := range outs {
-		ins = append(ins, p.Stderr())
+		writers = append(writers, p.Stderr())
 	}
 
-	return io.MultiWriter(ins...)
+	// Use slices.Compact to remove any nil writers
+	writers = slices.DeleteFunc(writers, func(w io.Writer) bool {
+		return w == nil
+	})
+
+	if len(writers) == 0 {
+		return os.Stderr
+	}
+
+	return io.MultiWriter(writers...)
 }

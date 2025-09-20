@@ -23,11 +23,11 @@ func (m *Manager) PluginName() string {
 
 func (m *Manager) WithPlugins(fn plugins.FeederFn) error {
 	if m == nil {
-		return fmt.Errorf("nil Manager")
+		return fmt.Errorf("manager cannot be nil")
 	}
 
 	if fn == nil {
-		return fmt.Errorf("nil FeederFn")
+		return fmt.Errorf("feeder function cannot be nil")
 	}
 
 	m.mu.Lock()

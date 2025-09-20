@@ -19,11 +19,11 @@ type FSable struct {
 
 func (f *FSable) FileSystem() (fs.FS, error) {
 	if f == nil {
-		return nil, fmt.Errorf("nil FSable")
+		return nil, fmt.Errorf("FSable instance cannot be nil")
 	}
 
 	if f.FS == nil {
-		return nil, fmt.Errorf("no fs.FS set")
+		return nil, fmt.Errorf("no filesystem configured")
 	}
 
 	return f.FS, nil
@@ -31,11 +31,11 @@ func (f *FSable) FileSystem() (fs.FS, error) {
 
 func (f *FSable) SetFileSystem(fs fs.FS) error {
 	if f == nil {
-		return fmt.Errorf("nil FSable")
+		return fmt.Errorf("FSable instance cannot be nil")
 	}
 
 	if fs == nil {
-		return fmt.Errorf("nil fs.FS")
+		return fmt.Errorf("filesystem cannot be nil")
 	}
 
 	f.mu.Lock()
