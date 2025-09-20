@@ -93,14 +93,14 @@ func (plugs Plugins) ScopedPlugins() Plugins {
 // IOSetable.
 func (plugs Plugins) SetStdio(io IO) error {
 	slog.Debug("setting stdio for plugins", "plugin_count", len(plugs))
-	
+
 	ios := ByType[IOSetable](plugs)
 	slog.Debug("found plugins implementing IOSetable", "count", len(ios))
 
 	for _, p := range ios {
 		if err := p.SetStdio(io); err != nil {
-			slog.Error("failed to set stdio for plugin", 
-				"plugin", p.PluginName(), 
+			slog.Error("failed to set stdio for plugin",
+				"plugin", p.PluginName(),
 				"error", err)
 			return fmt.Errorf("failed to set stdio for plugin %s: %w", p.PluginName(), err)
 		}
@@ -135,14 +135,14 @@ func (plugs Plugins) SetFileSystem(fs fs.FS) error {
 	}
 
 	slog.Debug("setting filesystem for plugins", "plugin_count", len(plugs))
-	
+
 	fsps := ByType[FSSetable](plugs)
 	slog.Debug("found plugins implementing FSSetable", "count", len(fsps))
 
 	for _, p := range fsps {
 		if err := p.SetFileSystem(fs); err != nil {
-			slog.Error("failed to set filesystem for plugin", 
-				"plugin", p.PluginName(), 
+			slog.Error("failed to set filesystem for plugin",
+				"plugin", p.PluginName(),
 				"error", err)
 			return fmt.Errorf("failed to set filesystem for plugin %s: %w", p.PluginName(), err)
 		}

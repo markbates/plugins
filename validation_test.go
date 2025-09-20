@@ -52,9 +52,9 @@ func Test_Plugins_Validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
-			
+
 			err := tt.plugins.Validate()
-			
+
 			if tt.expectError {
 				r.Error(err)
 				if tt.errorMsg != "" {
