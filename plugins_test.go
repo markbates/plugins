@@ -74,6 +74,24 @@ func Test_Plugins_SetStdio(t *testing.T) {
 	}
 }
 
+func Test_Plugins_SetStdio_ErrorHandling(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Test with an empty plugins slice which should succeed
+	plugs := Plugins{}
+	err := plugs.SetStdio(iox.IO{})
+	r.NoError(err)
+
+	// Test with non-IOSetable plugins (should succeed but do nothing)
+	plugs = Plugins{
+		plugtest.Simple(1),
+		plugtest.StringPlugin("test"),
+	}
+	err = plugs.SetStdio(iox.IO{})
+	r.NoError(err)
+}
+
 func Test_Plugins_WithPlugins(t *testing.T) {
 	t.Parallel()
 
@@ -192,4 +210,30 @@ func Test_Plugins_Available(t *testing.T) {
 
 	act := plugs.Available("a/b")
 	r.Len(act, 2)
+}
+
+func Test_Plugins_Available_WithNonCheckers(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Mix of plugins that implement AvailabilityChecker and those that don't
+	plugs := Plugins{
+		plugtest.AvailabilityChecker(true),   // Available
+		plugtest.AvailabilityChecker(false),  // Not available
+		plugtest.Simple(1),                   // No checker - always available
+		plugtest.StringPlugin("test"),        // No checker - always available
+		plugtest.AvailabilityChecker(true),   // Available
+	}
+
+	act := plugs.Available("/some/path")
+	r.Len(act, 4) // 2 available checkers + 2 non-checkers
+}
+
+func Test_Plugins_Available_EmptySlice(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{}
+	act := plugs.Available("/some/path")
+	r.Len(act, 0)
 }

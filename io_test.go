@@ -37,6 +37,22 @@ func Test_Stdout(t *testing.T) {
 	r.Equal("hi", bf3.Out.String())
 }
 
+func Test_Stdout_WithNonStdouters(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Test with plugins that don't implement Stdouter
+	plugs := []Plugin{
+		plugtest.Simple(1),
+		plugtest.StringPlugin("test"),
+	}
+	
+	w := Stdout(plugs...)
+	r.NotNil(w)
+	// Should fallback to os.Stdout when no plugins implement Stdouter
+	r.Equal(os.Stdout, w)
+}
+
 func Test_Stderr(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
@@ -62,4 +78,20 @@ func Test_Stderr(t *testing.T) {
 	r.Equal("hi", bf1.Err.String())
 	r.Equal("hi", bf2.Err.String())
 	r.Equal("hi", bf3.Err.String())
+}
+
+func Test_Stderr_WithNonStderrers(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Test with plugins that don't implement Stderrer
+	plugs := []Plugin{
+		plugtest.Simple(1),
+		plugtest.StringPlugin("test"),
+	}
+	
+	w := Stderr(plugs...)
+	r.NotNil(w)
+	// Should fallback to os.Stderr when no plugins implement Stderrer
+	r.Equal(os.Stderr, w)
 }

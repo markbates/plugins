@@ -1,8 +1,10 @@
 package plugins_test
 
 import (
+	"sort"
 	"testing"
 
+	"github.com/markbates/iox"
 	. "github.com/markbates/plugins"
 	"github.com/markbates/plugins/plugtest"
 	"github.com/stretchr/testify/require"
@@ -84,6 +86,19 @@ func Test_Plugins_Names(t *testing.T) {
 	r.Contains(names, "plugtest.Simple(1)")
 }
 
+func Test_Plugins_PluginName(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	plugs := Plugins{
+		plugtest.Simple(1),
+		plugtest.Simple(2),
+	}
+
+	name := plugs.PluginName()
+	r.Equal("plugins.Plugins", name)
+}
+
 func BenchmarkByType(b *testing.B) {
 	// Create a large slice of mixed plugins
 	plugs := make(Plugins, 1000)
@@ -121,5 +136,45 @@ func BenchmarkPlugins_Available(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = plugs.Available("/some/path")
+	}
+}
+
+func BenchmarkPlugins_SetStdio(b *testing.B) {
+	plugs := make(Plugins, 100)
+	for i := 0; i < 100; i++ {
+		plugs[i] = &plugtest.IO{}
+	}
+
+	io := iox.IO{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = plugs.SetStdio(io)
+	}
+}
+
+func BenchmarkPlugins_Names(b *testing.B) {
+	plugs := make(Plugins, 100)
+	for i := 0; i < 100; i++ {
+		plugs[i] = plugtest.Simple(i)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = plugs.Names()
+	}
+}
+
+func BenchmarkPlugins_Sort(b *testing.B) {
+	plugs := make(Plugins, 100)
+	for i := 0; i < 100; i++ {
+		plugs[i] = plugtest.Simple(99 - i) // Reverse order to make sorting work
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// Make a copy to sort since we need fresh data each iteration
+		sortPlugs := make(Plugins, len(plugs))
+		copy(sortPlugs, plugs)
+		sort.Sort(sortPlugs)
 	}
 }
